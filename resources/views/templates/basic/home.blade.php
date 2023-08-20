@@ -338,7 +338,7 @@
         .wrapper .option {
             background: #fff;
             height: 98%;
-            width: 112px;
+            width: 175px;
             display: flex;
             align-items: center;
             justify-content: space-evenly;

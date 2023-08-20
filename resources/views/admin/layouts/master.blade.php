@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="{{ asset('assets/admin/css/app.css') }}">
 
     <style>
-           ::-webkit-scrollbar {
+        ::-webkit-scrollbar {
             width: 2px;
         }
 
@@ -56,9 +56,11 @@
             border-radius: 10px;
             background: #515151;
         }
-       button.close.btn.btn--danger {
-        margin: 0px;
-}
+
+        button.close.btn.btn--danger {
+            margin: 0px;
+        }
+
         .sidebar__menu .sidebar-menu-item .side-menu--open,
         .sidebar__menu .sidebar-menu-item.active>a {
             background: none;
@@ -266,32 +268,32 @@
         }
 
         .icon-button__badge {
-    position: absolute;
-    /* right: 14px; */
-    /* top: 6px; */
-    left: 33px;
-    width: 25px;
-    height: 25px;
-    background: red;
-    color: #ffffff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    margin-top: 5px;
-}
-.sidebar__menu .sidebar-dropdown > a::before {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-family: "Font Awesome 5 Free";
-    font-weight: 700;
-    content: "\f107";
-    font-size: 13px;
-    color: #0e0e0e;
-    transition: all 0.3s;
-}
+            position: absolute;
+            /* right: 14px; */
+            /* top: 6px; */
+            left: 33px;
+            width: 25px;
+            height: 25px;
+            background: red;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            margin-top: 5px;
+        }
 
+        .sidebar__menu .sidebar-dropdown>a::before {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-family: "Font Awesome 5 Free";
+            font-weight: 700;
+            content: "\f107";
+            font-size: 13px;
+            color: #0e0e0e;
+            transition: all 0.3s;
+        }
     </style>
     @stack('style')
 </head>

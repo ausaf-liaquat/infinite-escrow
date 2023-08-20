@@ -21,11 +21,14 @@ class ChargeController extends Controller
             'charge_cap'    =>'required|numeric|gte:0',
             'fixed_charge'  =>'required|numeric|gte:0',
             'percent_charge'=>'required|numeric|gte:0',
+            'currency_sym'  =>'required',
         ]);
 
         $general                 = GeneralSetting::first();
         $general->charge_cap     = $request->charge_cap;
         $general->fixed_charge   = $request->fixed_charge;
+        $general->cur_text   = $request->currency_sym;
+        $general->cur_sym   = $request->currency_sym;
         $general->percent_charge = $request->percent_charge;
         $general->save();
 
@@ -39,10 +42,12 @@ class ChargeController extends Controller
             'minimum'       =>'required|numeric|gt:0',
             'maximum'       =>'required|numeric|gt:minimum',
             'fixed_charge'  =>'required|numeric|gte:0',
+            'currency_sym'  =>'required',
             'percent_charge'=>'required|numeric|gte:0|regex:/^\d+(\.\d{1,2})?$/',
         ]);
-
+        
         if($id){
+          
             $charge  = EscrowCharge::findOrFail($id);
             $message = 'Charge updated successfully';
         }else {
