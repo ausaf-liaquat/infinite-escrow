@@ -11,7 +11,7 @@
                     <div class="col-md-9 col-lg-7 col-xxl-6 text-center text-lg-start tilt-in-fwd-tr"
                         style="      position: relative;
                         top: -45px;">
-=>
+
                         <h4 class="hero__content-title text-capitalize text--accent mt-0"
                             style="background: -webkit-linear-gradient(#101609, #425a23);
                         -webkit-background-clip: text;
