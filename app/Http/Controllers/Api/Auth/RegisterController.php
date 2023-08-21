@@ -39,7 +39,32 @@ class RegisterController extends Controller
         $this->middleware('guest');
         $this->middleware('regStatus')->except('registrationNotAllowed');
     }
-
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function mValidator(array $data)
+    {
+        $general = GeneralSetting::first();
+        $password_validation = Password::min(6);
+        if ($general->secure_password) {
+            $password_validation = $password_validation->mixedCase()->numbers()->symbols()->uncompromised();
+        }
+        $countryData = (array)json_decode(file_get_contents(resource_path('views/partials/country.json')));
+        $mobileCodes = implode(',',array_column($countryData, 'dial_code'));
+        $validate = Validator::make($data, [
+            'firstname' => 'sometimes|required|string|max:50',
+            'lastname' => 'sometimes|required|string|max:50',
+            'email' => 'required|string|email|max:90|unique:users',
+            'mobile' => 'required|string|max:50|unique:users',
+            'password' => ['required',$password_validation],
+            'username' => 'required|alpha_num|unique:users|min:6',
+            'mobile_code' => 'required|in:'.$mobileCodes,
+        ]);
+        return $validate;
+    }
 
     /**
      * Get a validator for an incoming registration request.
@@ -78,7 +103,39 @@ class RegisterController extends Controller
         return $validate;
     }
 
-
+    public function mRegister(Request $request)
+    {
+        $validator = $this->mValidator($request->all());
+        if ($validator->fails()) {
+            return response()->json([
+                'message'=>$validator->errors()->all(),
+            ])->setStatusCode(400);
+        }
+        $exist = User::where('mobile',$request->mobile_code.$request->mobile)->first();
+        if ($exist) {
+            $response[] = 'The mobile number already exists';
+            return response()->json([
+                'message'=>$response,
+            ])->setStatusCode(409);
+        }
+        $countryData = (array)json_decode(file_get_contents(resource_path('views/partials/country.json')));
+        foreach ( $countryData as $element ) {
+            if ( $request['mobile_code'] == $element->dial_code ) {
+                $request['country_code'] = array_keys($countryData, $element)[0];
+                $request['country'] = $element->country;
+            }
+        }
+        $user = $this->create($request->all());
+        $request['mobile_code'] = str_replace('+', '',  $request['mobile_code']);
+        $response['access_token'] =  $user->createToken('auth_token')->plainTextToken;
+        $response['user'] = $user;
+        $response['token_type'] = 'Bearer';
+        $notify[] = 'Registration successfull';
+        return response()->json([
+            'message'=>$notify,
+            'data'=>$response
+        ])->setStatusCode(202);
+    }
     public function register(Request $request)
     {
         $validator = $this->validator($request->all());

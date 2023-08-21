@@ -44,7 +44,110 @@ class LoginController extends Controller
     {
         $this->username = $this->findUsername();
     }
+    public function mLogin(Request $request)
+    {
 
+        $validator = $this->validateLogin($request);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'code'=>200,
+                'status'=>'ok',
+                'message'=>$validator->errors()->all(),
+            ])->setStatusCode(400);
+        }
+
+        $credentials = request([$this->username, 'password']);
+        if(!Auth::attempt($credentials)){
+            $response[] = 'Unauthorized user';
+            return response()->json([
+                'code'=>401,
+                'status'=>'unauthorized',
+                'message'=>$response,
+            ])->setStatusCode(401);
+        }
+
+        $user = $request->user();
+        if($user->ev == false){
+            $response[] = 'Unauthorized user';
+            return response()->json([
+                'code'=>401,
+                'status'=>'unauthorized',
+                 'data'=> [
+                    'redirect'=> 'email',
+                    'user'=>$user
+                    ],
+                'message'=>$response,
+            ])->setStatusCode(401);
+        }
+        if($user->sv == false){
+            $response[] = 'Unauthorized user';
+            return response()->json([
+                'code'=>401,
+                'status'=>'unauthorized',
+                'data'=> [
+                    'redirect'=> 'sms',
+                    'user'=>$user
+                    ],
+                'message'=>$response,
+            ])->setStatusCode(401);
+        }
+        $user->tokens->each(function($token, $key) {
+            $token->delete();
+         });
+        $tokenResult = $user->createToken('auth_token')->plainTextToken;
+        $this->mauthenticated($request,$user);
+        $response[] = 'Login Succesfull';
+        return response()->json([
+            'code'=>200,
+            'status'=>'ok',
+            'message'=>$response,
+            'data'=>[
+                'user' => auth()->user(),
+                'access_token'=>$tokenResult,
+                'token_type'=>'Bearer'
+            ]
+        ])->setStatusCode(200);
+    }
+    public function mauthenticated(Request $request, $user)
+    {
+        if ($user->status == 0) {
+            auth()->user()->tokens()->delete();
+            $notify = 'Your account has been deactivated';
+            return response()->json([
+                'code'=>200,
+                'status'=>'ok',
+                'message'=>$notify,
+            ]);
+        }
+
+        $user = auth()->user();
+        $ip = $_SERVER["REMOTE_ADDR"];
+        $exist = UserLogin::where('user_ip',$ip)->first();
+        $userLogin = new UserLogin();
+        if ($exist) {
+            $userLogin->longitude =  $exist->longitude;
+            $userLogin->latitude =  $exist->latitude;
+            $userLogin->city =  $exist->city;
+            $userLogin->country_code = $exist->country_code;
+            $userLogin->country =  $exist->country;
+        }else{
+            $info = json_decode(json_encode(getIpInfo()), true);
+            $userLogin->longitude =  @implode(',',$info['long']);
+            $userLogin->latitude =  @implode(',',$info['lat']);
+            $userLogin->city =  @implode(',',$info['city']);
+            $userLogin->country_code = @implode(',',$info['code']);
+            $userLogin->country =  @implode(',', $info['country']);
+        }
+
+        $userAgent = osBrowser();
+        $userLogin->user_id = $user->id;
+        $userLogin->user_ip =  $ip;
+        
+        $userLogin->browser = @$userAgent['browser'];
+        $userLogin->os = @$userAgent['os_platform'];
+        $userLogin->save();
+    }
     public function login(Request $request)
     {
 

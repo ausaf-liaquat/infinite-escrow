@@ -11,11 +11,11 @@
                                 <div class="row g-4">
                                     <div class="col-md-6">
                                         <label class="d-block mb-2 sm-text">@lang('First Name')</label>
-                                        <input type="text" name="firstname" placeholder="@lang('Enter first name')" value="{{$user->firstname}}" class="form-control form--control" required>
+                                        <input type="text" name="firstname" placeholder="@lang('Enter first name')" value="{{$user->firstname}}" class="form-control form--control" readonly required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="d-block mb-2 sm-text">@lang('Last Name')</label>
-                                        <input type="text" name="lastname" placeholder="@lang('Enter last name')" value="{{$user->lastname}}" class="form-control form--control" required>
+                                        <input type="text" name="lastname" placeholder="@lang('Enter last name')" value="{{$user->lastname}}" class="form-control form--control" readonly required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="d-block mb-2 sm-text">@lang('E-mail Address')</label>
