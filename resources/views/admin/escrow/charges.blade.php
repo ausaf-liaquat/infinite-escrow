@@ -110,11 +110,11 @@
                                     <tr>
                                         <td data-label="@lang('SL')">{{ $loop->iteration }}</td>
                                         <td data-label="@lang('Minimum')">{{ getAmount($charge->minimum) }}
-                                            {{ $general->cur_text }}</td>
+                                            {{ $charge->currency_sym }}</td>
                                         <td data-label="@lang('Maximum')">{{ getAmount($charge->maximum) }}
-                                            {{ $general->cur_text }}</td>
+                                            {{ $charge->currency_sym }}</td>
                                         <td data-label="@lang('Fixed Charge')">{{ getAmount($charge->fixed_charge) }}
-                                            {{ $general->cur_text }}</td>
+                                            {{ $charge->currency_sym }}</td>
                                         <td data-label="@lang('Percent Charge')">{{ getAmount($charge->percent_charge) }} %</td>
                                         <td data-label="@lang('Action')">
                                             <button type="button" class="icon-btn cuModalBtn"
@@ -159,7 +159,7 @@
                             <div class="input-group has_append">
                                 <input type="number" step="any" class="form-control" name="minimum" required>
                                 <div class="input-group-append">
-                                    <select is="ms-dropdown" class="input-group-text text-accent" name="currency_sym"
+                                    <select is="ms-dropdown" class="input-group-text text-accent currency_sym" name="currency_sym"
                                     id="amount_sym" style="border: none;font-size: 15px;" required>
 
                                     <option value="NGN" {{ $general->cur_text == 'NGN' ? 'selected' : '' }}>NGN
@@ -182,7 +182,7 @@
                             <div class="input-group has_append">
                                 <input type="number" step="any" class="form-control" name="maximum" required>
                                 <div class="input-group-append">
-                                    <select is="ms-dropdown" class="input-group-text text-accent" name="currency_sym"
+                                    <select is="ms-dropdown" class="input-group-text text-accent currency_sym" name="currency_sym"
                                     id="amount_sym" style="border: none;font-size: 15px;">
 
                                     <option value="NGN" {{ $general->cur_text == 'NGN' ? 'selected' : '' }}>NGN
@@ -205,7 +205,7 @@
                             <div class="input-group has_append">
                                 <input type="number" step="any" class="form-control" name="fixed_charge" required>
                                 <div class="input-group-append">
-                                    <select is="ms-dropdown" class="input-group-text text-accent" name="currency_sym"
+                                    <select is="ms-dropdown" class="input-group-text text-accent currency_sym" name="currency_sym"
                                     id="amount_sym" style="border: none;font-size: 15px;">
 
                                     <option value="NGN" {{ $general->cur_text == 'NGN' ? 'selected' : '' }}>NGN
@@ -284,6 +284,14 @@
             var id = $(this).data('id');
             removeModal.find('[name=remove_id]').val(id);
             removeModal.modal('show');
+        });
+
+        $(document).ready(function () {
+            $('.currency_sym').change(function () { 
+              
+                $('.currency_sym').val($(this).val());
+                
+            });
         });
     </script>
 @endpush

@@ -59,6 +59,7 @@ class ChargeController extends Controller
         $charge->maximum        = $request->maximum;
         $charge->fixed_charge   = $request->fixed_charge;
         $charge->percent_charge = $request->percent_charge;
+        $charge->currency_sym    = $request->currency_sym;
         $charge->save();
 
         $notify[] = ['success', $message];
