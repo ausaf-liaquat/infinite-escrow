@@ -17,7 +17,7 @@
                                     <input type="number" step="any" class="form-control" name="charge_cap"
                                         value="{{ getAmount($general->charge_cap) }}" required>
                                     <div class="input-group-append">
-                                        <select is="ms-dropdown" class="input-group-text text-accent" name="currency_sym"
+                                        <select is="ms-dropdown" class="input-group-text text-accent currency_sym" name="currency_sym"
                                             id="amount_sym" style="border: none;font-size: 15px;">
 
                                             <option value="NGN" {{ $general->cur_text == 'NGN' ? 'selected' : '' }}>NGN
@@ -43,7 +43,7 @@
                                     <input type="number" step="any" class="form-control" name="fixed_charge"
                                         value="{{ getAmount($general->fixed_charge) }}" required>
                                     <div class="input-group-append">
-                                        <select is="ms-dropdown" class="input-group-text text-accent" name="currency_sym"
+                                        <select is="ms-dropdown" class="input-group-text text-accent currency_sym" name="currency_sym"
                                             id="amount_sym" style="border: none;font-size: 15px;">
 
                                             <option value="NGN" {{ $general->cur_text == 'NGN' ? 'selected' : '' }}>NGN

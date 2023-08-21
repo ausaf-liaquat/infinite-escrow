@@ -10,7 +10,7 @@
                 <div class="widget-two box--shadow2 b-radius--5 bg--success">
                     <div class="widget-two__content">
                         <h2 class="text-white">
-                            {{ __($general->cur_sym) }}{{ $withdrawals->where('status', 1)->sum('amount') }}</h2>
+                            {{ $withdrawals->where('status', 1)->sum('amount') }}</h2>
                         <p class="text-white">@lang('Approved Withdrawals')</p>
                     </div>
                 </div><!-- widget-two end -->
@@ -19,7 +19,7 @@
                 <div class="widget-two box--shadow2 b-radius--5 bg--6">
                     <div class="widget-two__content">
                         <h2 class="text-white">
-                            {{ __($general->cur_sym) }}{{ $withdrawals->where('status', 2)->sum('amount') }}</h2>
+                            {{ $withdrawals->where('status', 2)->sum('amount') }}</h2>
                         <p class="text-white">@lang('Pending Withdrawals')</p>
                     </div>
                 </div><!-- widget-two end -->
@@ -28,7 +28,7 @@
                 <div class="widget-two box--shadow2 b-radius--5 bg--pink">
                     <div class="widget-two__content">
                         <h2 class="text-white">
-                            {{ __($general->cur_sym) }}{{ $withdrawals->where('status', 3)->sum('amount') }}</h2>
+                            {{ $withdrawals->where('status', 3)->sum('amount') }}</h2>
                         <p class="text-white">@lang('Rejected Withdrawals')</p>
                     </div>
                 </div><!-- widget-two end -->
@@ -47,7 +47,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <span style="font-weight: 800;">
-                                                {{ __($general->cur_sym) }}{{ showAmount($withdraw->amount) }} - <span
+                                                {{ __($withdraw->currency) }}{{ showAmount($withdraw->amount) }} - <span
                                                     class="text-danger" data-toggle="tooltip"
                                                     data-original-title="@lang('charge')">{{ showAmount($withdraw->charge) }}
                                                 </span>

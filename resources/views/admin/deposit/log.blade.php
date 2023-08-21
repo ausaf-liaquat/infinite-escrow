@@ -9,7 +9,7 @@
             <div class="col-md-4 col-sm-6 mb-30">
                 <div class="widget-two box--shadow2 b-radius--5 bg--success">
                     <div class="widget-two__content">
-                        <h2 class="text-white">{{ __($general->cur_sym) }}{{ showAmount($successful) }}</h2>
+                        <h2 class="text-white">{{ showAmount($successful) }}</h2>
                         <p class="text-white">@lang('Successful Deposit')</p>
                     </div>
                 </div><!-- widget-two end -->
@@ -17,7 +17,7 @@
             <div class="col-md-4 col-sm-6 mb-30">
                 <div class="widget-two box--shadow2 b-radius--5 bg--6">
                     <div class="widget-two__content">
-                        <h2 class="text-white">{{ __($general->cur_sym) }}{{ showAmount($pending) }}</h2>
+                        <h2 class="text-white">{{ showAmount($pending) }}</h2>
                         <p class="text-white">@lang('Pending Deposit')</p>
                     </div>
                 </div><!-- widget-two end -->
@@ -25,7 +25,7 @@
             <div class="col-md-4 col-sm-6 mb-30">
                 <div class="widget-two box--shadow2 b-radius--5 bg--pink">
                     <div class="widget-two__content">
-                        <h2 class="text-white">{{ __($general->cur_sym) }}{{ showAmount($rejected) }}</h2>
+                        <h2 class="text-white">{{ showAmount($rejected) }}</h2>
                         <p class="text-white">@lang('Rejected Deposit')</p>
                     </div>
                 </div><!-- widget-two end -->
@@ -45,7 +45,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <span style="font-weight: 800;">
-                                                {{ __($general->cur_sym) }}{{ showAmount($deposit->amount) }} + <span
+                                                {{ __($deposit->method_currency) }}{{ showAmount($deposit->amount) }} + <span
                                                     class="text-danger" data-toggle="tooltip"
                                                     data-original-title="@lang('charge')">{{ showAmount($deposit->charge) }}
                                                 </span>

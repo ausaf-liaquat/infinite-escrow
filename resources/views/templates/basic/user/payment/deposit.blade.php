@@ -69,10 +69,10 @@
                                             <span class="fw-md">@lang('Payable')</span> <span><span class="payable fw-md">
                                                     0</span> <span class="currency_sym"></span></span>
                                         </li>
-                                        <li class="list-group-item justify-content-between d-none rate-element">
+                                        {{-- <li class="list-group-item justify-content-between d-none rate-element">
 
-                                        </li>
-                                        <li class="list-group-item justify-content-between d-none in-site-cur">
+                                        </li> --}}
+                                        {{-- <li class="list-group-item justify-content-between d-none in-site-cur">
                                             <span class="fw-md">@lang('In') <span
                                                     class="base-currency"></span></span>
                                             <span class="final_amo fw-md">0</span>
@@ -80,7 +80,7 @@
                                         <li class="list-group-item text-center crypto_currency d-none">
                                             <span>@lang('Conversion with') <span class="method_currency"></span>
                                                 @lang('and final value will show on next step')</span>
-                                        </li>
+                                        </li> --}}
                                     </ul>
                                 </div>
                             </div>

@@ -671,8 +671,8 @@
 						$(this).parents(".kwt-file").find(".kwt-file__input")[0].placeholder
 							? "or drop files here"
 							: `${
-                									$(this).parents(".kwt-file").find(".kwt-file__input")[0].placeholder
-                							  }`
+                    									$(this).parents(".kwt-file").find(".kwt-file__input")[0].placeholder
+                    							  }`
 					}`
                         );
                 });

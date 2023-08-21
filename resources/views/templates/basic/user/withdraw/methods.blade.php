@@ -27,7 +27,16 @@
                                         <label class="d-block mb-2 sm-text">@lang('Amount')</label>
                                         <div class="input-group">
                                             <input type="number" step="any" name="amount" class="form-control form--control" style="border-right: none !important;" required>
-                                            <select class="input-group-text bg--base " name="currency_sym" id="amount_sym" style="
+
+                                            <span class="input-group-text bg--base currency_symbol" style="
+                                            border-left: none;
+                                            font-size: 14px;
+                                            font-weight: 600;
+                                        ">
+
+                                            </span>
+                                            <input type="hidden" name="currency_symbol">
+                                            {{-- <select class="input-group-text bg--base " name="currency_symbol" id="amount_sym" style="
                                             border-left: none;
                                             font-size: 14px;
                                             font-weight: 600;
@@ -38,29 +47,29 @@
                                                 <option value="USDC">USDC</option>
                                                 <option value="BTC">BTC</option>
                                                 <option value="ETH">ETH</option>
-                                            </select>
+                                            </select> --}}
                                         </div>
                                     </div>
                                     <div class="col-md-12 mt-4">
                                         <ul class="list-group list-group-flush">
                                             <li class="list-group-item d-flex justify-content-between">
                                                 <span>@lang('Limit')</span>
-                                                <span><span class="min fw-bold">0</span> {{__($general->cur_text)}} - <span class="max fw-bold">0</span> {{__($general->cur_text)}}</span>
+                                                <span><span class="min fw-bold">0</span> <span class="currency_symbol"></span> - <span class="max fw-bold">0</span> <span class="currency_symbol"></span></span>
                                             </li>
                                             <li class="list-group-item d-flex justify-content-between">
                                                 <span>@lang('Charge')</span>
-                                                <span><span class="charge fw-bold">0</span> {{__($general->cur_text)}}</span>
+                                                <span><span class="charge fw-bold">0</span> <span class="currency_symbol"></span></span>
                                             </li>
                                             <li class="list-group-item d-flex justify-content-between">
-                                                <span>@lang('Receivable')</span> <span><span class="receivable fw-bold"> 0</span> {{__($general->cur_text)}} </span>
+                                                <span>@lang('Receivable')</span> <span><span class="receivable fw-bold"> 0</span> <span class="currency_symbol"></span> </span>
                                             </li>
-                                            <li class="list-group-item d-none justify-content-between rate-element">
+                                            {{-- <li class="list-group-item d-none justify-content-between rate-element">
 
                                             </li>
                                             <li class="list-group-item d-none justify-content-between in-site-cur">
                                                 <span>@lang('In') <span class="base-currency"></span></span>
                                                 <strong class="final_amo">0</strong>
-                                            </li>
+                                            </li> --}}
                                         </ul>
                                     </div>
                                 </div>
@@ -252,6 +261,8 @@
                 var fixed_charge = parseFloat(resource.fixed_charge);
                 var percent_charge = parseFloat(resource.percent_charge);
                 var rate = parseFloat(resource.rate)
+                $('.currency_symbol').empty().append(resource.currency);
+                $('input[name=currency_symbol]').val(resource.currency)
                 var toFixedDigit = 2;
                 $('.min').text(parseFloat(resource.min_limit).toFixed(2));
                 $('.max').text(parseFloat(resource.max_limit).toFixed(2));

@@ -81,7 +81,7 @@ class EscrowController extends Controller
             'category_id' => 'required|exists:categories,id'
         ]);
 
-        $charge         = $this->getCharge($request->amount);
+        $charge         = $this->getCharge($request->amount,$request->currency_sym);
         $data           = $request->except('_token');
         $data['charge'] = $charge;
         session()->put('escrow_info', $data);
@@ -120,7 +120,7 @@ class EscrowController extends Controller
         $toUser       = User::where('email', $request->email)->first();
         $amount       = $escrowInfo['amount'];
 
-        $charge       = $this->getCharge($amount);
+        $charge       = $this->getCharge($amount,$request->currency_sym);
         $sellerCharge = 0;
         $buyerCharge  = 0;
 
@@ -249,13 +249,14 @@ class EscrowController extends Controller
         return view($this->activeTemplate . 'user.escrow.details', compact('pageTitle', 'escrow', 'restAmount', 'conversation', 'messages'));
     }
 
-    private function getCharge($amount)
+    private function getCharge($amount,$currency_sym)
     {
 
         $general           = GeneralSetting::first();
         $percentCharge     = $general->percent_charge;
         $fixedCharge       = $general->fixed_charge;
-        $escrowCharge      = EscrowCharge::where('minimum', '<=', $amount)->where('maximum', '>=', $amount)->first();
+        // $escrowCharge      = EscrowCharge::where('minimum', '<=', $amount)->where('maximum', '>=', $amount)->first();
+        $escrowCharge      = EscrowCharge::where('currency_sym',$currency_sym)->first();
 
         if ($escrowCharge) {
             $percentCharge = $escrowCharge->percent_charge;

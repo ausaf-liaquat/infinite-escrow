@@ -12,7 +12,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <span style="font-weight: 800;">
-                                                {{ $general->cur_sym }}{{ showAmount($escrow->amount) }}
+                                                {{ $escrow->currency_sym }} {{ showAmount($escrow->amount) }}
                                             </span>
                                             <span class="float-right">
                                                 {{ \Carbon\Carbon::parse($escrow->updated_at)->diffForHumans() }}

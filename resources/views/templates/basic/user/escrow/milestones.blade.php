@@ -31,7 +31,7 @@
                                     </td>
                                     <td data-label="@lang('Note')">{{ __($milestone->note) }}</td>
                                     <td data-label="@lang('Amount')">
-                                        {{ $general->cur_sym }}{{ showAmount($milestone->amount) }}</td>
+                                        {{ $milestone->currency }}{{ showAmount($milestone->amount) }}</td>
                                     <td data-label="@lang('Payment Status')">
                                         @if ($milestone->payment_status == 1)
                                             <span class="badge badge--success">@lang('Funded')</span>
