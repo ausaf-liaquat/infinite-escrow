@@ -78,6 +78,7 @@ Route::namespace('Admin')->prefix('admin')->name('admin.')->group(function () {
     Route::middleware('admin')->group(function () {
 
         Route::get('currency/change', 'AdminController@currencyChange')->name('currency.change');
+        Route::get('currency/user/change', 'AdminController@currencyUserChange')->name('currency.user-change');
         
         Route::get('dashboard', 'AdminController@dashboard')->name('dashboard');
         Route::get('profile', 'AdminController@profile')->name('profile');

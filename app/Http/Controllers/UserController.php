@@ -172,12 +172,20 @@ class UserController extends Controller
 
     public function withdrawStore(Request $request)
     {
+        // dd($request->all());
         $this->validate($request, [
             'method_code' => 'required',
-            'amount' => 'required|numeric'
+            'amount'      => 'required|numeric'
         ]);
-        $method = WithdrawMethod::where('id', $request->method_code)->where('status', 1)->firstOrFail();
-        $user = auth()->user();
+       $method  = WithdrawMethod::where('currency', $request->currency_symbol)->where('status', 1)->firstOrFail();
+       $user    = auth()->user();
+       $balance = auth()->user()->userBalance->where('currency_sym',$request->currency_symbol)->first()?->balance??0;
+
+        // dd($balance);
+        if (empty($method)) {
+            $notify[] = ['error', 'Add withdrawal method for this currency.'];
+            return back()->withNotify($notify);
+        }
         if ($request->amount < $method->min_limit) {
             $notify[] = ['error', 'Your requested amount is smaller than minimum amount.'];
             return back()->withNotify($notify);
@@ -187,36 +195,39 @@ class UserController extends Controller
             return back()->withNotify($notify);
         }
 
-        if ($request->amount > $user->balance) {
+        if ($request->amount > $balance) {
             $notify[] = ['error', 'You do not have sufficient balance for withdraw.'];
             return back()->withNotify($notify);
         }
 
-        $charge = $method->fixed_charge + ($request->amount * $method->percent_charge / 100);
+        $charge      = $method->fixed_charge + ($request->amount * $method->percent_charge / 100);
         $afterCharge = $request->amount - $charge;
-        $finalAmount = $afterCharge * $method->rate;
+        $finalAmount = $afterCharge;
+        // $finalAmount = $afterCharge * $method->rate;
 
-        $withdraw = new Withdrawal();
-        $withdraw->method_id = $method->id; // wallet method ID
-        $withdraw->user_id = $user->id;
-        $withdraw->amount = $request->amount;
-        $withdraw->currency = $method->currency;
-        $withdraw->rate = $method->rate;
-        $withdraw->charge = $charge;
+        $withdraw               = new Withdrawal();
+        $withdraw->method_id    = $method->id;        // wallet method ID
+        $withdraw->user_id      = $user->id;
+        $withdraw->amount       = $request->amount;
+        $withdraw->currency     = $method->currency;
+        $withdraw->rate         = $method->rate;
+        $withdraw->charge       = $charge;
         $withdraw->final_amount = $finalAmount;
         $withdraw->after_charge = $afterCharge;
-        $withdraw->trx = getTrx();
+        $withdraw->trx          = getTrx();
         $withdraw->save();
-        session()->put('wtrx', $withdraw->trx);
+        session()->put(['wtrx'=>$withdraw->trx,'balance'=>$balance]);
 
         return redirect()->route('user.withdraw.preview');
     }
 
     public function withdrawPreview()
     {
+        // dd(session()->all());
         $withdraw = Withdrawal::with('method','user')->where('trx', session()->get('wtrx'))->where('status', 0)->orderBy('id','desc')->firstOrFail();
         $pageTitle = 'Withdraw Preview';
-        return view($this->activeTemplate . 'user.withdraw.preview', compact('pageTitle','withdraw'));
+        $balance = session()->get('balance');
+        return view($this->activeTemplate . 'user.withdraw.preview', compact('pageTitle','withdraw','balance'));
     }
 
     public function withdrawSubmit(Request $request)
@@ -254,9 +265,9 @@ class UserController extends Controller
                 return back()->withNotify($notify);
             }
         }
-
-
-        if ($withdraw->amount > $user->balance) {
+        $userBalance_find = UserBalance::where('currency_sym', $withdraw->currency)->where('user_id', $user->id)->first();
+        $balance = auth()->user()->userBalance->where('currency_sym',$withdraw->currency)->first()?->balance??0;
+        if ($withdraw->amount > $balance) {
             $notify[] = ['error', 'Your request amount is larger then your current balance.'];
             return back()->withNotify($notify);
         }
@@ -303,7 +314,7 @@ class UserController extends Controller
         $withdraw->save();
         $user->balance  -=  $withdraw->amount;
         $user->save();
-        $userBalance_find = UserBalance::where('currency_sym', $withdraw->currency)->where('user_id', $user->id)->first();
+        
         if ($userBalance_find) {
             $userBalance_find->balance -= $withdraw->amount;
             $userBalance_find->save();
@@ -313,8 +324,9 @@ class UserController extends Controller
         $transaction = new Transaction();
         $transaction->user_id = $withdraw->user_id;
         $transaction->amount = $withdraw->amount;
-        $transaction->post_balance = $user->balance;
+        $transaction->post_balance = $userBalance_find->balance;
         $transaction->charge = $withdraw->charge;
+        $transaction->currency_sym = $withdraw->currency;
         $transaction->trx_type = '-';
         $transaction->details = showAmount($withdraw->final_amount) . ' ' . $withdraw->currency . ' Withdraw Via ' . $withdraw->method->name;
         $transaction->trx =  $withdraw->trx;
@@ -332,10 +344,10 @@ class UserController extends Controller
             'method_amount' => showAmount($withdraw->final_amount),
             'amount' => showAmount($withdraw->amount),
             'charge' => showAmount($withdraw->charge),
-            'currency' => $general->cur_text,
+            'currency' =>  $withdraw->currency,
             'rate' => showAmount($withdraw->rate),
             'trx' => $withdraw->trx,
-            'post_balance' => showAmount($user->balance),
+            'post_balance' => showAmount($userBalance_find->balance),
             'delay' => $withdraw->method->delay
         ]);
 
@@ -405,19 +417,19 @@ class UserController extends Controller
             'code' => 'required',
         ]);
 
-        $user = auth()->user();
+        $user     = auth()->user();
         $response = verifyG2fa($user,$request->code);
         if ($response) {
             $user->tsc = null;
-            $user->ts = 0;
+            $user->ts  = 0;
             $user->save();
             $userAgent = getIpInfo();
             $osBrowser = osBrowser();
             notify($user, '2FA_DISABLE', [
                 'operating_system' => @$osBrowser['os_platform'],
-                'browser' => @$osBrowser['browser'],
-                'ip' => @$userAgent['ip'],
-                'time' => @$userAgent['time']
+                'browser'          => @$osBrowser['browser'],
+                'ip'               => @$userAgent['ip'],
+                'time'             => @$userAgent['time']
             ]);
             $notify[] = ['success', 'Two factor authenticator disable successfully'];
         } else {
@@ -427,7 +439,7 @@ class UserController extends Controller
     }
 
     public function transactions(){
-        $pageTitle = 'Transactions';
+        $pageTitle    = 'Transactions';
         $emptyMessage = 'Transactions not found';
         $transactions = Transaction::where('user_id',auth()->user()->id)->orderBy('id','desc')->paginate(getPaginate());
 
@@ -448,14 +460,15 @@ class UserController extends Controller
         // $escrow5 = clone $escrow;
         // $escrow6 = clone $escrow;
         
-        $userBalance = UserBalance::where('id',auth()->user()->id)->where('currency_sym',$request->currency)->first();
+        $userBalance = UserBalance::where('user_id',auth()->user()->id)->where('currency_sym',$request->currency)->first();
 
-        $balanceAmount= $userBalance?$userBalance->sum('balance')??0:0;
-        $depositAmount_total= $user->deposits->where('status',1)->where('method_currency',$request->currency)->sum('amount');
-        $withdrawAmount_total= $user->withdrawals->where('status',1)->where('currency',$request->currency)->sum('amount');
-        $depositAmountPending_total= $user->deposits->where('status',2)->where('currency_sym',$request->currency)->sum('amount');
-        $withdrawAmountPending_total= $user->withdrawals->where('status',2)->where('currency',$request->currency)->sum('amount');
-        $milestoneAmount_total= Milestone::where('user_id',$user->id)->whereHas('escrow',function ($q) use($request)
+        $balanceAmount       = $userBalance?$userBalance->balance??0:0;
+        $depositAmount_total = $user->deposits->where('status',1)->where('method_currency',$request->currency)->sum('amount');
+
+        $withdrawAmount_total        = $user->withdrawals->where('status',1)->where('currency',$request->currency)->sum('amount');
+        $depositAmountPending_total  = $user->deposits->where('status',2)->where('currency_sym',$request->currency)->sum('amount');
+        $withdrawAmountPending_total = $user->withdrawals->where('status',2)->where('currency',$request->currency)->sum('amount');
+        $milestoneAmount_total       = Milestone::where('user_id',$user->id)->whereHas('escrow',function ($q) use($request)
         {
             $q->where('currency_sym',$request->currency);
         })->where('payment_status',1)->sum('amount');
@@ -463,13 +476,13 @@ class UserController extends Controller
       
    
         $data=[
-            'balanceAmount'=>$balanceAmount??0,
-            'depositAmount_total'=>$depositAmount_total??0,
-            'withdrawAmount_total'=>$withdrawAmount_total??0,
-            'depositAmountPending_total'=>$depositAmountPending_total??0,
-            'withdrawAmountPending_total'=>$withdrawAmountPending_total??0,
-            'milestoneAmount_total'=>$milestoneAmount_total??0,
-            'sym'=>$request->currency,
+            'balanceAmount'               => $balanceAmount??0,
+            'depositAmount_total'         => $depositAmount_total??0,
+            'withdrawAmount_total'        => $withdrawAmount_total??0,
+            'depositAmountPending_total'  => $depositAmountPending_total??0,
+            'withdrawAmountPending_total' => $withdrawAmountPending_total??0,
+            'milestoneAmount_total'       => $milestoneAmount_total??0,
+            'sym'                         => $request->currency,
   
         ];
         return $data;

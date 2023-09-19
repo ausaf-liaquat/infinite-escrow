@@ -10,6 +10,7 @@ use App\Models\GeneralSetting;
 use App\Models\Milestone;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\UserBalance;
 use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
 
@@ -156,11 +157,24 @@ class PaymentController extends Controller
             $user->balance += $data->amount;
             $user->currency_sym = $data->method_currency;
             $user->save();
+            $userBalance_find = UserBalance::where('currency_sym', $data->method_currency)->where('user_id', $user->id)->first();
+            if ($userBalance_find) {
+                $userBalance_find->balance += $data->amount;
+                $userBalance_find->save();
+            } else {
+                $userBalance = new UserBalance();
+                $userBalance->user_id = $user->id;
+                $userBalance->balance += $data->amount;
+                $userBalance->currency_sym = $data->method_currency;
+                $userBalance->save();
+            }
+            
 
             $transaction = new Transaction();
             $transaction->user_id = $data->user_id;
             $transaction->amount = $data->amount;
-            $transaction->post_balance = $user->balance;
+            $transaction->currency_sym = $data->method_currency;
+            $transaction->post_balance = $userBalance_find->balance;
             $transaction->charge = $data->charge;
             $transaction->trx_type = '+';
             $transaction->details = 'Deposit Via ' . $data->gatewayCurrency()->name;
@@ -179,10 +193,10 @@ class PaymentController extends Controller
                 'method_amount' => showAmount($data->final_amo),
                 'amount' => showAmount($data->amount),
                 'charge' => showAmount($data->charge),
-                'currency' => $general->cur_text,
+                'currency' => $data->method_currency,
                 'rate' => showAmount($data->rate),
                 'trx' => $data->trx,
-                'post_balance' => showAmount($user->balance)
+                'post_balance' => showAmount($userBalance_find->balance)
             ]);
 
             if ($data->milestone_id) {
@@ -296,7 +310,7 @@ class PaymentController extends Controller
             'method_amount' => showAmount($data->final_amo),
             'amount' => showAmount($data->amount),
             'charge' => showAmount($data->charge),
-            'currency' => $general->cur_text,
+            'currency' =>$data->method_currency,
             'rate' => showAmount($data->rate),
             'trx' => $data->trx
         ]);

@@ -17,6 +17,7 @@
                                         <label class="d-block mb-2 sm-text">@lang('Title')</label>
                                         <input type="text" name="title" value="{{ old('title') }}" placeholder="@lang('Enter title')" class="form-control form--control" required>
                                     </div>
+                                    {{-- @dd($escrowInfo['charge']) --}}
                                     <div class="col-md-12 mt-4">
                                         <label class="d-block mb-2 sm-text">@lang('Charge')</label>
                                         <div class="input-group">

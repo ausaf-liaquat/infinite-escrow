@@ -276,7 +276,7 @@ class PaymentController extends Controller
             'method_amount' => showAmount($data->final_amo),
             'amount' => showAmount($data->amount),
             'charge' => showAmount($data->charge),
-            'currency' => $general->cur_text,
+            'currency' => $data->method_currency,
             'rate' => showAmount($data->rate),
             'trx' => $data->trx
         ]);

@@ -12,14 +12,14 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <span style="font-weight: 800;">
-                                        {{ __($general->cur_sym) }}{{ showAmount($withdraw->amount) }} - <span
+                                        {{ __($withdraw->currency) }} {{ showAmount($withdraw->amount) }} - <span
                                             class="text-danger" data-toggle="tooltip"
                                             data-original-title="@lang('charge')">{{ showAmount($withdraw->charge) }}
                                         </span>
                                         <br>
                                         <strong data-toggle="tooltip" data-original-title="@lang('Amount after charge')">
                                             {{ showAmount($withdraw->amount - $withdraw->charge) }}
-                                            {{ __($general->cur_text) }}
+                                            {{ __($withdraw->currency) }}
                                         </strong>
                                     </span>
                                     <span class="float-right">
@@ -168,7 +168,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">@lang('Details')</h5>
-                    <button type="button" class="close btn btn--danger" data-bs-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close btn btn--danger" data-dismiss="modal" aria-label="Close">
                         <i class="las la-times"></i>
                     </button>
                 </div>

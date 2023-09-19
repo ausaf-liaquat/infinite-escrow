@@ -127,6 +127,7 @@ class EscrowController extends Controller
             $transaction->amount       = $request->buyer_amount;
             $transaction->post_balance = $buyer->balance;
             $transaction->charge       = 0;
+            $transaction->currency_sym = $escrow->currency_sym;
             $transaction->trx_type     = '+';
             $transaction->details      = 'Admin has taken action to the escrow and send this amount to you';
             $transaction->trx          = $trx;
@@ -141,6 +142,8 @@ class EscrowController extends Controller
             $transaction->user_id      = $seller->id;
             $transaction->amount       = $request->seller_amount;
             $transaction->post_balance = $seller->balance;
+            $transaction->currency_sym = $escrow->currency_sym;
+
             $transaction->charge       = 0;
             $transaction->trx_type     = '+';
             $transaction->details      = 'Admin has taken action to the escrow and send this amount to you';
@@ -158,7 +161,7 @@ class EscrowController extends Controller
             'buyer_amount' => showAmount($request->buyer_amount),
             'charge'       => showAmount($charge),
             'trx'          => $trx,
-            'currency'     => $general->cur_text,
+            'currency'     => $escrow->currency_sym,
         ];
 
         if ($buyer) {

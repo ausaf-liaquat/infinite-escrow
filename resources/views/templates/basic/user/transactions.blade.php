@@ -11,7 +11,7 @@
                             <div class="col-md-12">
                                 <span style="font-weight: 800;">
                                     <span class="font-weight-bold @if($trx->trx_type == '+') text--success @else text--danger @endif">
-                                        {{ $trx->trx_type }} {{showAmount($trx->amount)}} {{ $general->cur_text }}
+                                        {{ $trx->trx_type }} {{showAmount($trx->amount)}} {{ $trx->currency_sym }}
                                     </span>
                                 </span>
                                 <span class="float-right">
@@ -28,7 +28,7 @@
                                     <small>{{ $trx->trx }}</small>
 
                                     <br>
-                                    {{ showAmount($trx->post_balance) }} {{ __($general->cur_text) }}
+                                    {{ showAmount($trx->post_balance) }} {{ __($trx->currency_sym) }}
 
                                 </span>
                                 <span class="float-right">
@@ -84,12 +84,12 @@
 
                                     <td data-label="@lang('Amount')" class="budget">
                                         <span class="font-weight-bold @if($trx->trx_type == '+') text--success @else text--danger @endif">
-                                            {{ $trx->trx_type }} {{showAmount($trx->amount)}} {{ $general->cur_text }}
+                                            {{ $trx->trx_type }} {{showAmount($trx->amount)}} {{ $trx->currency_sym }}
                                         </span>
                                     </td>
 
                                     <td data-label="@lang('Post Balance')" class="budget">
-                                        {{ showAmount($trx->post_balance) }} {{ __($general->cur_text) }}
+                                        {{ showAmount($trx->post_balance) }} {{ __($trx->currency_sym) }}
                                     </td>
 
 

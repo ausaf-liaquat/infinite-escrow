@@ -163,7 +163,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">@lang('Details')</h5>
-                    <button type="button" class="close btn btn--danger" data-bs-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close btn btn--danger" data-dismiss="modal" aria-label="Close">
                         <i class="las la-times"></i>
                     </button>
                 </div>
@@ -172,7 +172,7 @@
                         <li class="list-group-item">@lang('Amount') : <span class="withdraw-amount "></span></li>
                         <li class="list-group-item">@lang('Charge') : <span class="withdraw-charge "></span></li>
                         <li class="list-group-item">@lang('After Charge') : <span class="withdraw-after_charge"></span></li>
-                        <li class="list-group-item">@lang('Conversion Rate') : <span class="withdraw-rate"></span></li>
+                        {{-- <li class="list-group-item">@lang('Conversion Rate') : <span class="withdraw-rate"></span></li> --}}
                         <li class="list-group-item">@lang('Payable Amount') : <span class="withdraw-payable"></span></li>
                     </ul>
                     <ul class="list-group list-group-flush withdraw-detail mt-1">
@@ -188,7 +188,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">@lang('Details')</h5>
-                    <button type="button" class="close btn btn--danger" data-bs-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close btn btn--danger" data-dismiss="modal" aria-label="Close">
                         <i class="las la-times"></i>
                     </button>
                 </div>

@@ -17,7 +17,7 @@
                              </div>
                              <div class="col-md-8">
                                  <h4 class="mt-0">@lang('Please Pay') {{showAmount($deposit->final_amo)}} {{__($deposit->method_currency)}}</h4>
-                                 <h5 class="mt-0">@lang('To Get') {{showAmount($deposit->amount)}}  {{__($general->cur_text)}}</h5>
+                                 <h5 class="mt-0">@lang('To Get') {{showAmount($deposit->amount)}}  {{__($deposit->method_currency)}}</h5>
                                  <button type="button" class="btn btn--md btn--base btn-custom2 " id="btn-confirm" onClick="payWithRave()">@lang('Pay Now')</button>
                              </div>
                          </div>

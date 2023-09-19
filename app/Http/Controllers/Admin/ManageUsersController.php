@@ -8,6 +8,7 @@ use App\Models\Gateway;
 use App\Models\GeneralSetting;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\UserBalance;
 use App\Models\UserLogin;
 use App\Models\WithdrawMethod;
 use App\Models\Withdrawal;
@@ -21,7 +22,7 @@ class ManageUsersController extends Controller
     {
         $pageTitle = 'Manage Users';
         $emptyMessage = 'No user found';
-        $users = User::orderBy('id','desc')->paginate(getPaginate());
+        $users = User::orderBy('id','desc')->get();
         return view('admin.users.list', compact('pageTitle', 'emptyMessage', 'users'));
     }
 
@@ -29,7 +30,7 @@ class ManageUsersController extends Controller
     {
         $pageTitle = 'Manage Active Users';
         $emptyMessage = 'No active user found';
-        $users = User::active()->orderBy('id','desc')->paginate(getPaginate());
+        $users = User::active()->orderBy('id','desc')->get();
         return view('admin.users.list', compact('pageTitle', 'emptyMessage', 'users'));
     }
 
@@ -37,7 +38,7 @@ class ManageUsersController extends Controller
     {
         $pageTitle = 'Banned Users';
         $emptyMessage = 'No banned user found';
-        $users = User::banned()->orderBy('id','desc')->paginate(getPaginate());
+        $users = User::banned()->orderBy('id','desc')->get();
         return view('admin.users.list', compact('pageTitle', 'emptyMessage', 'users'));
     }
 
@@ -45,14 +46,14 @@ class ManageUsersController extends Controller
     {
         $pageTitle = 'Email Unverified Users';
         $emptyMessage = 'No email unverified user found';
-        $users = User::emailUnverified()->orderBy('id','desc')->paginate(getPaginate());
+        $users = User::emailUnverified()->orderBy('id','desc')->get();
         return view('admin.users.list', compact('pageTitle', 'emptyMessage', 'users'));
     }
     public function emailVerifiedUsers()
     {
         $pageTitle = 'Email Verified Users';
         $emptyMessage = 'No email verified user found';
-        $users = User::emailVerified()->orderBy('id','desc')->paginate(getPaginate());
+        $users = User::emailVerified()->orderBy('id','desc')->get();
         return view('admin.users.list', compact('pageTitle', 'emptyMessage', 'users'));
     }
 
@@ -61,7 +62,7 @@ class ManageUsersController extends Controller
     {
         $pageTitle = 'SMS Unverified Users';
         $emptyMessage = 'No sms unverified user found';
-        $users = User::smsUnverified()->orderBy('id','desc')->paginate(getPaginate());
+        $users = User::smsUnverified()->orderBy('id','desc')->get();
         return view('admin.users.list', compact('pageTitle', 'emptyMessage', 'users'));
     }
 
@@ -70,7 +71,7 @@ class ManageUsersController extends Controller
     {
         $pageTitle = 'SMS Verified Users';
         $emptyMessage = 'No sms verified user found';
-        $users = User::smsVerified()->orderBy('id','desc')->paginate(getPaginate());
+        $users = User::smsVerified()->orderBy('id','desc')->get();
         return view('admin.users.list', compact('pageTitle', 'emptyMessage', 'users'));
     }
 
@@ -79,7 +80,7 @@ class ManageUsersController extends Controller
     {
         $pageTitle = 'Users with balance';
         $emptyMessage = 'No sms verified user found';
-        $users = User::where('balance','!=',0)->orderBy('id','desc')->paginate(getPaginate());
+        $users = User::where('balance','!=',0)->orderBy('id','desc')->get();
         return view('admin.users.list', compact('pageTitle', 'emptyMessage', 'users'));
     }
 
@@ -180,14 +181,28 @@ class ManageUsersController extends Controller
         if ($request->act) {
             $user->balance += $amount;
             $user->save();
-            $notify[] = ['success', $general->cur_sym . $amount . ' has been added to ' . $user->username . '\'s balance'];
+            
+            $userBalance_find = UserBalance::where('currency_sym', $request->currency_sym)->where('user_id', $user->id)->first();
+            if ($userBalance_find) {
+                $userBalance_find->balance += $amount;
+                $userBalance_find->save();
+            } else {
+                $userBalance = new UserBalance();
+                $userBalance->user_id = $user->id;
+                $userBalance->balance += $amount;
+                $userBalance->currency_sym = $request->currency_sym;
+                $userBalance->save();
+            }
+
+            $notify[] = ['success', $request->currency_sym . $amount . ' has been added to ' . $user->username . '\'s balance'];
 
             $transaction = new Transaction();
             $transaction->user_id = $user->id;
             $transaction->amount = $amount;
-            $transaction->post_balance = $user->balance;
+            $transaction->post_balance = $userBalance->balance;
             $transaction->charge = 0;
             $transaction->trx_type = '+';
+            $transaction->currency_sym = $request->currency_sym;
             $transaction->details = 'Added Balance Via Admin';
             $transaction->trx =  $trx;
             $transaction->save();
@@ -195,26 +210,39 @@ class ManageUsersController extends Controller
             notify($user, 'BAL_ADD', [
                 'trx' => $trx,
                 'amount' => showAmount($amount),
-                'currency' => $general->cur_text,
-                'post_balance' => showAmount($user->balance),
+                'currency' => $request->currency_sym,
+                'post_balance' => showAmount($userBalance->balance),
             ]);
 
         } else {
-            if ($amount > $user->balance) {
+            $userBalance_find = UserBalance::where('currency_sym', $request->currency_sym)->where('user_id', $user->id)->first();
+            $balance =  $userBalance_find?->balance ?? 0;
+            if ($amount > $balance) {
                 $notify[] = ['error', $user->username . '\'s has insufficient balance.'];
                 return back()->withNotify($notify);
             }
             $user->balance -= $amount;
             $user->save();
 
-
+            $userBalance_find = UserBalance::where('currency_sym', $request->currency_sym)->where('user_id', $user->id)->first();
+            if ($userBalance_find) {
+                $userBalance_find->balance -= $amount;
+                $userBalance_find->save();
+            } else {
+                $userBalance = new UserBalance();
+                $userBalance->user_id = $user->id;
+                $userBalance->balance -= $amount;
+                $userBalance->currency_sym = $request->currency_sym;
+                $userBalance->save();
+            }
 
             $transaction = new Transaction();
             $transaction->user_id = $user->id;
             $transaction->amount = $amount;
-            $transaction->post_balance = $user->balance;
+            $transaction->post_balance = $userBalance_find->balance;
             $transaction->charge = 0;
             $transaction->trx_type = '-';
+            $transaction->currency_sym = $request->currency_sym;
             $transaction->details = 'Subtract Balance Via Admin';
             $transaction->trx =  $trx;
             $transaction->save();
@@ -223,10 +251,10 @@ class ManageUsersController extends Controller
             notify($user, 'BAL_SUB', [
                 'trx' => $trx,
                 'amount' => showAmount($amount),
-                'currency' => $general->cur_text,
-                'post_balance' => showAmount($user->balance)
+                'currency' => $request->currency_sym,
+                'post_balance' => showAmount($userBalance_find->balance)
             ]);
-            $notify[] = ['success', $general->cur_sym . $amount . ' has been subtracted from ' . $user->username . '\'s balance'];
+            $notify[] = ['success', $request->currency_sym . $amount . ' has been subtracted from ' . $user->username . '\'s balance'];
         }
         return back()->withNotify($notify);
     }

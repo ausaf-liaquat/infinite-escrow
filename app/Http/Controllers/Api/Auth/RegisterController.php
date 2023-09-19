@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AdminNotification;
 use App\Models\GeneralSetting;
 use App\Models\User;
+use App\Models\UserBalance;
 use App\Models\UserLogin;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -217,6 +218,29 @@ class RegisterController extends Controller
         $user->tv = 1;
         $user->save();
 
+        $user1BalanceNGN = UserBalance::create([
+            'user_id' => $user->id,
+            'currency_sym' => 'NGN',
+            'balance' => 0,
+        ]);
+    
+        $user2BalanceUSD = UserBalance::create([
+            'user_id' => $user->id,
+            'currency_sym' => 'USD',
+            'balance' => 0,
+        ]);
+    
+        $user3BalanceUSDC = UserBalance::create([
+            'user_id' => $user->id,
+            'currency_sym' => 'USDC',
+            'balance' => 0,
+        ]);
+    
+        $user4BalanceBTC = UserBalance::create([
+            'user_id' => $user->id,
+            'currency_sym' => 'BTC',
+            'balance' => 0,
+        ]);
 
         $adminNotification = new AdminNotification();
         $adminNotification->user_id = $user->id;

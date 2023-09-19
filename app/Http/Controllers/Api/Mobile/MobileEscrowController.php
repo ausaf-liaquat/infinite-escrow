@@ -273,10 +273,23 @@ class MobileEscrowController  extends Controller
 
             $user->save();
 
+            $userBalance_find = UserBalance::where('currency_sym', $escrow->currency_sym)->where('user_id', $user->id)->first();
+            if ($userBalance_find) {
+                $userBalance_find->balance += $amount;
+                $userBalance_find->save();
+            } else {
+                $userBalance = new UserBalance();
+                $userBalance->user_id = $user->id;
+                $userBalance->balance += $amount;
+                $userBalance->currency_sym = $escrow->currency_sym;
+                $userBalance->save();
+            }
+
             $transaction = new Transaction();
             $transaction->user_id = $user->id;
             $transaction->amount = $amount;
-            $transaction->post_balance = $user->balance;
+            $transaction->post_balance =$userBalance_find->balance;
+            $transaction->currency_sym = $escrow->currency_sym;
             $transaction->charge = 0;
             $transaction->trx_type = '+';
             $transaction->details = 'Milestone amount refunded for cancelling the escrow';
@@ -296,7 +309,7 @@ class MobileEscrowController  extends Controller
                 'amount' => showAmount($escrow->amount),
                 'canceller' => $canceller,
                 'total_fund' => showAmount($amount),
-                'currency' => $general->cur_text,
+                'currency' => $escrow->currency_sym,
             ]);
         }
 
@@ -337,7 +350,7 @@ class MobileEscrowController  extends Controller
             'disputer'    => $disputer,
             'total_fund'  => showAmount($escrow->paid_amount),
             'dispute_note' => $request->details,
-            'currency'    => $general->cur_text,
+            'currency'    => $escrow->currency_sym,
         ]);
 
         return response()->json([
@@ -917,7 +930,8 @@ class MobileEscrowController  extends Controller
         $transaction = new Transaction();
         $transaction->user_id = $withdraw->user_id;
         $transaction->amount = $withdraw->amount;
-        $transaction->post_balance = $user->balance;
+        $transaction->post_balance = $userBalance_find->balance;
+        $transaction->currency_sym = $withdraw->currency;
         $transaction->charge = $withdraw->charge;
         $transaction->trx_type = '-';
         $transaction->details = showAmount($withdraw->final_amount) . ' ' . $withdraw->currency . ' Withdraw Via ' . $withdraw->method->name;
@@ -936,10 +950,10 @@ class MobileEscrowController  extends Controller
             'method_amount' => showAmount($withdraw->final_amount),
             'amount' => showAmount($withdraw->amount),
             'charge' => showAmount($withdraw->charge),
-            'currency' => $general->cur_text,
+            'currency' => $withdraw->currency,
             'rate' => showAmount($withdraw->rate),
             'trx' => $withdraw->trx,
-            'post_balance' => showAmount($user->balance),
+            'post_balance' => showAmount($userBalance_find->balance),
             'delay' => $withdraw->method->delay
         ]);
 

@@ -2,6 +2,7 @@
 @section('panel')
     <div class="row">
         <div class="col-lg-12">
+           
             <div class="row">
                 @forelse($users as $user)
                     <div class="col-md-12">
@@ -10,11 +11,16 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <span class="font-weight-bold">
+                                            {{-- <span class="font-weight-bold totalBalance">  </span> --}}
+                                            {{-- <span class="font-weight-bold totalBalance">
 
-                                                {{ $general->cur_sym }}{{ showAmount($user->balance) }}
+                                                {{ $general->cur_sym }} {{ showAmount($user->balance) }}
+                                            </span> --}}
+                                            {{ $user->fullname }}
+                                            <span class="small">
+                                                <a
+                                                    href="{{ route('admin.users.detail', $user->id) }}"><span>@</span>{{ $user->username }}</a>
                                             </span>
-
 
 
                                             <span class="float-right">
@@ -25,12 +31,12 @@
                                         <div class="col-md-12 mt-3">
                                             <span>
 
-                                                {{ $user->fullname }}
+                                                {{-- {{ $user->fullname }}
 
                                                 <span class="small">
                                                     <a
                                                         href="{{ route('admin.users.detail', $user->id) }}"><span>@</span>{{ $user->username }}</a>
-                                                </span>
+                                                </span> --}}
                                                 <br>
                                                 @if ($user->status == 0)
                                                     <span

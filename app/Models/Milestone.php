@@ -23,11 +23,16 @@ class Milestone extends Model
         if ($milestone) {
             $user->balance -= $milestone->amount;
             $user->save();
-
+            $userBalance_find = UserBalance::where('currency_sym', $milestone->currency)->where('user_id', $user->id)->first();
+            if ($userBalance_find) {
+                $userBalance_find->balance -= $milestone->amount;
+                $userBalance_find->save();
+            } 
             $transaction = new Transaction();
             $transaction->user_id = $user->id;
+            $transaction->currency_sym = $milestone->currency;
             $transaction->amount = $milestone->amount;
-            $transaction->post_balance = $user->balance;
+            $transaction->post_balance = $userBalance_find->balance;
             $transaction->charge = 0;
             $transaction->trx_type = '+';
             $transaction->details = 'Milestone paid for '.$milestone->escrow->title;

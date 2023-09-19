@@ -16,6 +16,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use AmrShawky\LaravelCurrency\Facade\Currency;
+use App\Models\Transaction;
+use App\Models\UserBalance;
+
 class AdminController extends Controller
 {
 
@@ -297,5 +300,22 @@ class AdminController extends Controller
         ];
         return $data;
     }
-
+    public function currencyUserChange(Request $request)
+    {
+      
+        
+        $totalDepositAmount= Deposit::where('status',1)->where('user_id',$request->userID)->where('method_currency',$request->currency)->sum('amount');
+        $totalWithdrawAmount= Withdrawal::where('status',1)->where('user_id',$request->userID)->where('currency',$request->currency)->sum('amount');
+        $totalTransaction= Transaction::where('user_id',$request->userID)->where('currency_sym',$request->currency)->count();
+        $userBalance_find = UserBalance::where('currency_sym', $request->currency)->where('user_id', $request->userID)->first();
+        $balance =  $userBalance_find?->balance ?? 0;
+        $data=[
+            'totalDepositAmount'=>number_format($totalDepositAmount,2)??0,
+            'totalWithdrawAmount'=>number_format($totalWithdrawAmount,2)??0,
+            'totalTransaction'=>$totalTransaction,
+            'totalBalance'=>number_format($balance).' ' .$request->currency,
+            'sym'=>$request->currency, 
+        ];
+        return $data;
+    }
 }

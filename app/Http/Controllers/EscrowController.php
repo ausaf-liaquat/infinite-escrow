@@ -75,6 +75,7 @@ class EscrowController extends Controller
 
     public function submitInformation(Request $request)
     {
+        // dd($request->all());
         $request->validate([
             'type'    => 'required|in:1,2',
             'amount'     => 'required|numeric|gt:0',
@@ -105,7 +106,7 @@ class EscrowController extends Controller
 
     public function store(Request $request)
     {
-        // dd(session('escrow_info'));
+        // dd(session('escrow_info'),$request->all());
         $this->validation($request);
 
         $escrowInfo     = session('escrow_info');
@@ -120,7 +121,7 @@ class EscrowController extends Controller
         $toUser       = User::where('email', $request->email)->first();
         $amount       = $escrowInfo['amount'];
 
-        $charge       = $this->getCharge($amount,$request->currency_sym);
+        $charge       = $this->getCharge($amount,$escrowInfo['currency_sym']);
         $sellerCharge = 0;
         $buyerCharge  = 0;
 
@@ -263,11 +264,11 @@ class EscrowController extends Controller
             $fixedCharge   = $escrowCharge->fixed_charge;
         }
 
-        $charge            = ($amount * $percentCharge) / 100 + $fixedCharge;
-
-        if ($charge > $general->charge_cap) {
-            $charge        = $general->charge_cap;
-        }
+        // $charge            = ($amount * $percentCharge) / 100 + $fixedCharge;
+        $charge            = $escrowCharge->fixed_charge;
+        // if ($charge > $general->charge_cap) {
+        //     $charge        = $general->charge_cap;
+        // }
 
         return $charge;
     }
@@ -300,12 +301,25 @@ class EscrowController extends Controller
 
             $user->save();
 
+            $userBalance_find = UserBalance::where('currency_sym', $escrow->currency_sym)->where('user_id', $user->id)->first();
+            if ($userBalance_find) {
+                $userBalance_find->balance += $amount;
+                $userBalance_find->save();
+            } else {
+                $userBalance = new UserBalance();
+                $userBalance->user_id = $user->id;
+                $userBalance->balance += $amount;
+                $userBalance->currency_sym = $escrow->currency_sym;
+                $userBalance->save();
+            }
+
             $transaction = new Transaction();
             $transaction->user_id = $user->id;
             $transaction->amount = $amount;
             $transaction->post_balance = $user->balance;
             $transaction->charge = 0;
             $transaction->trx_type = '+';
+            $transaction->currency_sym = $escrow->currency_sym;
             $transaction->details = 'Milestone amount refunded for cancelling the escrow';
             $transaction->trx = getTrx();
             $transaction->save();
@@ -323,7 +337,7 @@ class EscrowController extends Controller
                 'amount' => showAmount($escrow->amount),
                 'canceller' => $canceller,
                 'total_fund' => showAmount($amount),
-                'currency' => $general->cur_text,
+                'currency' => $escrow->currency_sym,
             ]);
         }
 
@@ -359,7 +373,7 @@ class EscrowController extends Controller
             'amount' => showAmount($escrow->amount),
             'accepter' => $accepter,
             'total_fund' => showAmount($escrow->paid_amount),
-            'currency' => $general->cur_text,
+            'currency' => $escrow->currency_sym,
         ]);
 
         $notify[] = ['success', 'Escrow accepted successfully'];
@@ -402,6 +416,7 @@ class EscrowController extends Controller
         $transaction->post_balance = $seller->balance;
         $transaction->charge = 0;
         $transaction->trx_type = '+';
+        $transaction->currency_sym = $escrow->currency_sym;
         $transaction->details = 'Escrow payment withdrawals';
         $transaction->trx = $trx;
         $transaction->save();
@@ -420,6 +435,7 @@ class EscrowController extends Controller
             $transaction->user_id = $seller->id;
             $transaction->amount = $escrow->seller_charge;
             $transaction->post_balance = $seller->balance;
+            $transaction->currency_sym = $escrow->currency_sym;
             $transaction->charge = 0;
             $transaction->trx_type = '-';
             $transaction->details = 'Escrow charge pay';
@@ -436,7 +452,7 @@ class EscrowController extends Controller
             'seller_charge' => showAmount($escrow->seller_charge),
             'trx' => $trx,
             'post_balance' => showAmount($seller->balance),
-            'currency' => $general->cur_text,
+            'currency' => $escrow->currency_sym,
         ]);
 
         $notify[] = ['success', 'Escrow payment dispatched successfully'];
@@ -479,7 +495,7 @@ class EscrowController extends Controller
             'disputer'    => $disputer,
             'total_fund'  => showAmount($escrow->paid_amount),
             'dispute_note' => $request->details,
-            'currency'    => $general->cur_text,
+            'currency'    => $escrow->currency_sym,
         ]);
 
         $notify[] = ['success', 'Escrow disputed successfully'];
@@ -634,6 +650,8 @@ class EscrowController extends Controller
         $transaction->post_balance = $user->balance;
         $transaction->charge       = 0;
         $transaction->trx_type     = '+';
+        $transaction->currency_sym = $milestone->currency;
+
         $transaction->details      = 'Milestone paid for ' . $milestone->escrow->title;
         $transaction->trx          = getTrx();
         $transaction->save();

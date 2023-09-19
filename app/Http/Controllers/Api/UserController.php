@@ -7,6 +7,7 @@ use App\Models\AdminNotification;
 use App\Models\Deposit;
 use App\Models\GeneralSetting;
 use App\Models\Transaction;
+use App\Models\UserBalance;
 use App\Models\WithdrawMethod;
 use App\Models\Withdrawal;
 use App\Rules\FileTypeValidate;
@@ -141,6 +142,7 @@ class UserController extends Controller
             ]);
         }
         $user = auth()->user();
+        $balance = auth()->user()->userBalance->where('currency_sym',$request->currency_symbol)->first()?->balance??0;
         if ($request->amount < $method->min_limit) {
             $notify[] = 'Your requested amount is smaller than minimum amount.';
             return response()->json([
@@ -158,7 +160,7 @@ class UserController extends Controller
 	        ]);
         }
 
-        if ($request->amount > $user->balance) {
+        if ($request->amount > $balance) {
             $notify[] = 'You do not have sufficient balance for withdraw.';
             return response()->json([
                 'code'=>200,
@@ -240,6 +242,7 @@ class UserController extends Controller
         }
         
         $user = auth()->user();
+        $balance = auth()->user()->userBalance->where('currency_sym',$request->currency_symbol)->first()?->balance??0;
         if ($user->ts) {
             $response = verifyG2fa($user,$request->authenticator_code);
             if (!$response) {
@@ -253,7 +256,7 @@ class UserController extends Controller
         }
 
 
-        if ($withdraw->amount > $user->balance) {
+        if ($withdraw->amount > $balance) {
             $notify[] = 'Your request amount is larger then your current balance.';
             return response()->json([
                 'code'=>200,
@@ -307,13 +310,18 @@ class UserController extends Controller
         $user->balance  -=  $withdraw->amount;
         $user->save();
 
-
+        $userBalance_find = UserBalance::where('currency_sym', $withdraw->currency)->where('user_id', $user->id)->first();
+        if ($userBalance_find) {
+            $userBalance_find->balance -= $withdraw->amount;
+            $userBalance_find->save();
+        } 
 
         $transaction = new Transaction();
         $transaction->user_id = $withdraw->user_id;
         $transaction->amount = $withdraw->amount;
-        $transaction->post_balance = $user->balance;
+        $transaction->post_balance = $userBalance_find->balance;
         $transaction->charge = $withdraw->charge;
+        $transaction->currency_sym = $withdraw->currency;
         $transaction->trx_type = '-';
         $transaction->details = showAmount($withdraw->final_amount) . ' ' . $withdraw->currency . ' Withdraw Via ' . $withdraw->method->name;
         $transaction->trx =  $withdraw->trx;
@@ -332,10 +340,10 @@ class UserController extends Controller
             'method_amount' => showAmount($withdraw->final_amount),
             'amount' => showAmount($withdraw->amount),
             'charge' => showAmount($withdraw->charge),
-            'currency' => $general->cur_text,
+            'currency' => $withdraw->currency,
             'rate' => showAmount($withdraw->rate),
             'trx' => $withdraw->trx,
-            'post_balance' => showAmount($user->balance),
+            'post_balance' => showAmount($userBalance_find->balance),
             'delay' => $withdraw->method->delay
         ]);
 

@@ -1,6 +1,6 @@
 @extends($activeTemplate.'layouts.master')
 @section('content')
-    <div class="section">
+    <div class="section mt-5">
         <div class="container">
             <div class="row g-4 justify-content-center">
                 <div class="col-md-10 col-xl-6">
@@ -21,7 +21,7 @@
                                             {{ showAmount($deposit->final_amo) }}
                                             {{ __($deposit->method_currency) }}</h4>
                                         <h5 class="mt-0">@lang('To Get') {{ showAmount($deposit->amount) }}
-                                            {{ __($general->cur_text) }}</h5>
+                                            {{ __($deposit->method_currency) }}</h5>
                                         <button type="button" class="btn btn--md btn--base btn-custom2 "
                                             id="btn-confirm">@lang('Pay Now')</button>
                                         <script src="//js.paystack.co/v1/inline.js" data-key="{{ $data->key }}" data-email="{{ $data->email }}"

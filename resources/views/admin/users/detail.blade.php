@@ -3,7 +3,15 @@
 @section('panel')
     <div class="row mb-none-30">
         <div class="col-xl-3 col-lg-5 col-md-5 mb-30">
-
+            <select class="currency_exchange input-group-text bg--base text-black mb-4" style="color:black; background-color:white;"
+            name="" id="amount_sym">
+    
+            <option value="NGN">NGN</option>
+            <option value="USD">USD</option>
+            <option value="USDC">USDC</option>
+            <option value="BTC">BTC</option>
+            <option value="ETH">ETH</option>
+        </select>
             <div class="card b-radius--10 overflow-hidden box--shadow1">
                 <div class="card-body p-0">
                     <div class="p-3 bg--white">
@@ -37,7 +45,7 @@
 
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             @lang('Balance')
-                            <span class="font-weight-bold">{{showAmount($user->balance)}}  {{__($general->cur_text)}}</span>
+                            <span class="font-weight-bold totalBalance">  </span>
                         </li>
                     </ul>
                 </div>
@@ -77,8 +85,9 @@
                         </div>
                         <div class="details">
                             <div class="numbers">
-                                <span class="currency-sign"> {{__($general->cur_sym)}}</span>
-                                <span class="amount">{{showAmount($totalDeposit)}}</span>
+                                <span class="currency-sign"> </span>
+                                <span class="amountDeposit" style="color: #fff;"></span>
+                                {{-- <span class="amountDeposit">{{showAmount($totalDeposit)}}</span> --}}
                             </div>
                             <div class="desciption">
                                 <span>@lang('Total Deposit')</span>
@@ -96,8 +105,9 @@
                         </div>
                         <div class="details">
                             <div class="numbers">
-                                <span class="currency-sign">{{__($general->cur_sym)}}</span>
-                                <span class="amount">{{showAmount($totalWithdraw)}}</span>
+                                <span class="currency-sign"></span>
+                                <span class="amountWithdraw" style="color: #fff;"></span>
+                                {{-- <span class="amountWithdraw">{{showAmount($totalWithdraw)}}</span> --}}
                             </div>
                             <div class="desciption">
                                 <span>@lang('Total Withdraw')</span>
@@ -114,7 +124,8 @@
                         </div>
                         <div class="details">
                             <div class="numbers">
-                                <span class="amount">{{$totalTransaction}}</span>
+                                <span class="totalTransaction" style="color: #fff;"></span>
+                                {{-- <span class="totalTransaction">{{$totalTransaction}}</span> --}}
                             </div>
                             <div class="desciption">
                                 <span>@lang('Total Transaction')</span>
@@ -295,7 +306,19 @@
                                 <div class="input-group has_append">
                                     <input type="text" name="amount" class="form-control" placeholder="@lang('Please provide positive amount')">
                                     <div class="input-group-append">
-                                        <div class="input-group-text">{{ __($general->cur_sym) }}</div>
+                                        {{-- <div class="input-group-text">{{ __($general->cur_sym) }}</div> --}}
+                                        <select class="input-group-text text-black " name="currency_sym" id="amount_sym" style="
+                                            border-left: none;
+                                            font-size: 14px;
+                                            font-weight: 600;
+                                        ">
+                                                
+                                                <option value="NGN" selected>NGN</option>
+                                                <option value="USD">USD</option>
+                                                <option value="USDC">USDC</option>
+                                                <option value="BTC">BTC</option>
+                                                <option value="ETH">ETH</option>
+                                            </select>
                                     </div>
                                 </div>
                             </div>
@@ -325,5 +348,33 @@
         mobileNumber = mobileNumber.replace(dialCode,'');
         $('input[name=mobile]').val(mobileNumber);
         mobileElement.text(`+${dialCode}`);
+    </script>
+     <script>
+        $(document).ready(function() {
+            $('.currency_exchange').change(function(e) {
+                e.preventDefault();
+
+                $.ajax({
+                    type: "get",
+                    url: "{{ route('admin.currency.user-change') }}",
+                    data: {
+                        currency: $(this).val(),
+                        userID: "{{$user->id}}",
+
+                    },
+
+                    success: function(res) {
+                        $('.currency-sign').empty();
+                        $('.currency-sign').hide().fadeIn().empty().append(res.sym)
+                        $('.amountDeposit').hide().fadeIn().empty().append(res.totalDepositAmount);
+                        $('.amountWithdraw').hide().fadeIn().empty().append(res.totalWithdrawAmount);
+                        $('.totalTransaction').hide().fadeIn().empty().append(res.totalTransaction);
+                        $('.totalBalance').hide().fadeIn().empty().append(res.totalBalance);
+                        
+                    }
+                });
+            });
+            $('.currency_exchange').trigger('change');
+        });
     </script>
 @endpush

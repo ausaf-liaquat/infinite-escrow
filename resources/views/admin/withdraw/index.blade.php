@@ -15,7 +15,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <span style="font-weight: 800;">
-                                                {{ showAmount($method->fixed_charge)}} {{__($general->cur_text) }} {{ (0 < $method->percent_charge) ? ' + '. showAmount($method->percent_charge) .' %' : '' }}
+                                                {{ showAmount($method->fixed_charge)}} {{__($method->currency) }} {{ (0 < $method->percent_charge) ? ' + '. showAmount($method->percent_charge) .' %' : '' }}
                                             </span>
                                             <span class="float-right">
                                                 {{ showDateTime($method->created_at) }} <br>
@@ -98,10 +98,10 @@
                                     <td data-label="@lang('Currency')"
                                         class="font-weight-bold">{{ __($method->currency) }}</td>
                                     <td data-label="@lang('Charge')"
-                                        class="font-weight-bold">{{ showAmount($method->fixed_charge)}} {{__($general->cur_text) }} {{ (0 < $method->percent_charge) ? ' + '. showAmount($method->percent_charge) .' %' : '' }} </td>
+                                        class="font-weight-bold">{{ showAmount($method->fixed_charge)}} {{__($method->currency) }} {{ (0 < $method->percent_charge) ? ' + '. showAmount($method->percent_charge) .' %' : '' }} </td>
                                     <td data-label="@lang('Withdraw Limit')"
                                         class="font-weight-bold">{{ $method->min_limit + 0 }}
-                                        - {{ $method->max_limit + 0 }} {{__($general->cur_text) }}</td>
+                                        - {{ $method->max_limit + 0 }} {{__($method->currency) }}</td>
                                     <td data-label="@lang('Processing Time')">{{ $method->delay }}</td>
                                     <td data-label="@lang('Status')">
                                         @if($method->status == 1)

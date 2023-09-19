@@ -164,7 +164,7 @@ class DepositController extends Controller
     {
         $general = GeneralSetting::first();
         $deposit = Deposit::where('id', $id)->with($this->depoRelations)->firstOrFail();
-        $pageTitle = $deposit->user->username.' requested ' . showAmount($deposit->amount) . ' '.$general->cur_text;
+        $pageTitle = $deposit->user->username.' requested ' . showAmount($deposit->amount) . ' '.$deposit->method_currency;
         $details = ($deposit->detail != null) ? json_encode($deposit->detail) : null;
         return view('admin.deposit.detail', compact('pageTitle', 'deposit','details'));
     }
@@ -181,7 +181,7 @@ class DepositController extends Controller
         $user = User::find($deposit->user_id);
         $user->balance = $user->balance + $deposit->amount;
         $user->save();
-
+        $balance = $user->userBalance->where('currency_sym',$deposit->method_currency)->first()?->balance??0;
         $userBalance_find = UserBalance::where('currency_sym', $deposit->method_currency)->where('user_id', $user->id)->first();
         if ($userBalance_find) {
             $userBalance_find->balance += $deposit->amount;
@@ -197,8 +197,9 @@ class DepositController extends Controller
         $transaction = new Transaction();
         $transaction->user_id = $deposit->user_id;
         $transaction->amount = $deposit->amount;
-        $transaction->post_balance = $user->balance;
+        $transaction->post_balance = $balance;
         $transaction->charge = $deposit->charge;
+        $transaction->currency_sym = $deposit->method_currency;
         $transaction->trx_type = '+';
         $transaction->details = 'Deposit Via ' . $deposit->gatewayCurrency()->name;
         $transaction->trx =  $deposit->trx;
@@ -211,10 +212,10 @@ class DepositController extends Controller
             'method_amount' => showAmount($deposit->final_amo),
             'amount' => showAmount($deposit->amount),
             'charge' => showAmount($deposit->charge),
-            'currency' => $general->cur_text,
+            'currency' => $deposit->method_currency,
             'rate' => showAmount($deposit->rate),
             'trx' => $deposit->trx,
-            'post_balance' => showAmount($user->balance)
+            'post_balance' => showAmount($balance)
         ]);
         $notify[] = ['success', 'Deposit request has been approved.'];
 
@@ -241,7 +242,7 @@ class DepositController extends Controller
             'method_amount' => showAmount($deposit->final_amo),
             'amount' => showAmount($deposit->amount),
             'charge' => showAmount($deposit->charge),
-            'currency' => $general->cur_text,
+            'currency' => $deposit->method_currency,
             'rate' => showAmount($deposit->rate),
             'trx' => $deposit->trx,
             'rejection_message' => $request->message

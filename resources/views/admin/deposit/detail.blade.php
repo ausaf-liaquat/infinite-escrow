@@ -29,19 +29,19 @@
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             @lang('Amount')
-                            <span class="font-weight-bold">{{ showAmount($deposit->amount ) }} {{ __($general->cur_text) }}</span>
+                            <span class="font-weight-bold">{{ showAmount($deposit->amount ) }} {{ __($deposit->method_currency) }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             @lang('Charge')
-                            <span class="font-weight-bold">{{ showAmount($deposit->charge ) }} {{ __($general->cur_text) }}</span>
+                            <span class="font-weight-bold">{{ showAmount($deposit->charge ) }} {{ __($deposit->method_currency) }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             @lang('After Charge')
-                            <span class="font-weight-bold">{{ showAmount($deposit->amount+$deposit->charge ) }} {{ __($general->cur_text) }}</span>
+                            <span class="font-weight-bold">{{ showAmount($deposit->amount+$deposit->charge ) }} {{ __($deposit->method_currency) }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             @lang('Rate')
-                            <span class="font-weight-bold">1 {{__($general->cur_text)}}
+                            <span class="font-weight-bold">1 {{__($deposit->method_currency)}}
                                 = {{ showAmount($deposit->rate) }} {{__($deposit->baseCurrency())}}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -103,7 +103,7 @@
                                 <button class="btn btn--success ml-1 approveBtn"
                                         data-id="{{ $deposit->id }}"
                                         data-info="{{$details}}"
-                                        data-amount="{{ showAmount($deposit->amount)}} {{ __($general->cur_text) }}"
+                                        data-amount="{{ showAmount($deposit->amount)}} {{ __($deposit->method_currency) }}"
                                         data-username="{{ @$deposit->user->username }}"
                                         data-toggle="tooltip" data-original-title="@lang('Approve')"><i class="fas fa-check"></i>
                                     @lang('Approve')
@@ -112,7 +112,7 @@
                                 <button class="btn btn--danger ml-1 rejectBtn"
                                         data-id="{{ $deposit->id }}"
                                         data-info="{{$details}}"
-                                        data-amount="{{ showAmount($deposit->amount)}} {{ __($general->cur_text) }}"
+                                        data-amount="{{ showAmount($deposit->amount)}} {{ __($deposit->method_currency) }}"
                                         data-username="{{ @$deposit->user->username }}"
                                         data-toggle="tooltip" data-original-title="@lang('Reject')"><i class="fas fa-ban"></i>
                                     @lang('Reject')

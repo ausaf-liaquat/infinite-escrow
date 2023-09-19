@@ -37,12 +37,12 @@
 
                                 <td data-label="@lang('Amount')" class="budget">
                                     <span class="font-weight-bold @if($trx->trx_type == '+')text-success @else text-danger @endif">
-                                        {{ $trx->trx_type }} {{showAmount($trx->amount)}} {{ $general->cur_text }}
+                                        {{ $trx->trx_type }} {{showAmount($trx->amount)}} {{ $trx->currency_sym }}
                                     </span>
                                 </td>
 
                                 <td data-label="@lang('Post Balance')" class="budget">
-                                   {{ showAmount($trx->post_balance) }} {{ __($general->cur_text) }}
+                                   {{ showAmount($trx->post_balance) }} {{ __($trx->currency_sym) }}
                                </td>
 
 

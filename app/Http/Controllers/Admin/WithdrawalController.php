@@ -6,6 +6,7 @@ use App\Models\GeneralSetting;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\UserBalance;
 use App\Models\WithdrawMethod;
 use App\Models\Withdrawal;
 use Carbon\Carbon;
@@ -62,7 +63,9 @@ class WithdrawalController extends Controller
             $pageTitle = 'Withdrawals Via '.$method->name;
             $withdrawals = Withdrawal::where('status', '!=', 0)->with(['user','method'])->where('method_id',$method->id)->orderBy('id','desc')->paginate(getPaginate());
         }
+
         $emptyMessage = 'No withdrawal found';
+
         return view('admin.withdraw.withdrawals', compact('pageTitle', 'withdrawals', 'emptyMessage','method'));
     }
 
@@ -112,30 +115,38 @@ class WithdrawalController extends Controller
         if ($start && !preg_match($pattern,$start)) {
             $notify[] = ['error','Invalid date format'];
             return redirect()->route('admin.withdraw.log')->withNotify($notify);
+        
         }
         if ($end && !preg_match($pattern,$end)) {
             $notify[] = ['error','Invalid date format'];
             return redirect()->route('admin.withdraw.log')->withNotify($notify);
+        
         }
 
 
         if ($start) {
             $withdrawals = Withdrawal::where('status','!=',0)->whereDate('created_at',Carbon::parse($start));
+        
         }
         if($end){
             $withdrawals = Withdrawal::where('status','!=',0)->whereDate('created_at','>=',Carbon::parse($start))->whereDate('created_at','<=',Carbon::parse($end));
+        
         }
         if ($request->method) {
             $method = WithdrawMethod::findOrFail($request->method);
             $withdrawals = $withdrawals->where('method_id',$method->id);
+        
         }
 
         if ($scope == 'pending') {
             $withdrawals = $withdrawals->where('status', 2);
+
         }elseif($scope == 'approved'){
             $withdrawals = $withdrawals->where('status', 1);
+        
         }elseif($scope == 'rejected') {
             $withdrawals = $withdrawals->where('status', 3);
+        
         }
 
         $withdrawals = $withdrawals->with(['user', 'method'])->paginate(getPaginate());
@@ -151,7 +162,7 @@ class WithdrawalController extends Controller
     {
         $general = GeneralSetting::first();
         $withdrawal = Withdrawal::where('id',$id)->where('status', '!=', 0)->with(['user','method'])->firstOrFail();
-        $pageTitle = $withdrawal->user->username.' Withdraw Requested ' . showAmount($withdrawal->amount) . ' '.$general->cur_text;
+        $pageTitle = $withdrawal->user->username.' Withdraw Requested ' . showAmount($withdrawal->amount) . ' '.$withdrawal->currency;
         $details = $withdrawal->withdraw_information ? json_encode($withdrawal->withdraw_information) : null;
 
 
@@ -176,7 +187,7 @@ class WithdrawalController extends Controller
             'method_amount' => showAmount($withdraw->final_amount),
             'amount' => showAmount($withdraw->amount),
             'charge' => showAmount($withdraw->charge),
-            'currency' => $general->cur_text,
+            'currency' => $withdraw->currency,
             'rate' => showAmount($withdraw->rate),
             'trx' => $withdraw->trx,
             'admin_details' => $request->details
@@ -201,15 +212,26 @@ class WithdrawalController extends Controller
         $user->balance += $withdraw->amount;
         $user->save();
 
-
+        $userBalance_find = UserBalance::where('currency_sym', $withdraw->currency)->where('user_id', $user->id)->first();
+        if ($userBalance_find) {
+            $userBalance_find->balance += $withdraw->amount;
+            $userBalance_find->save();
+        } else {
+            $userBalance = new UserBalance();
+            $userBalance->user_id = $user->id;
+            $userBalance->balance += $withdraw->amount;
+            $userBalance->currency_sym = $withdraw->currency;
+            $userBalance->save();
+        }
 
             $transaction = new Transaction();
             $transaction->user_id = $withdraw->user_id;
             $transaction->amount = $withdraw->amount;
-            $transaction->post_balance = $user->balance;
+            $transaction->post_balance = $userBalance_find->balance;
             $transaction->charge = 0;
+            $transaction->currency_sym = $withdraw->currency;
             $transaction->trx_type = '+';
-            $transaction->details = showAmount($withdraw->amount) . ' ' . $general->cur_text . ' Refunded from withdrawal rejection';
+            $transaction->details = showAmount($withdraw->amount) . ' ' . $withdraw->currency . ' Refunded from withdrawal rejection';
             $transaction->trx = $withdraw->trx;
             $transaction->save();
 
@@ -222,10 +244,10 @@ class WithdrawalController extends Controller
             'method_amount' => showAmount($withdraw->final_amount),
             'amount' => showAmount($withdraw->amount),
             'charge' => showAmount($withdraw->charge),
-            'currency' => $general->cur_text,
+            'currency' => $withdraw->currency,
             'rate' => showAmount($withdraw->rate),
             'trx' => $withdraw->trx,
-            'post_balance' => showAmount($user->balance),
+            'post_balance' => showAmount($userBalance_find->balance),
             'admin_details' => $request->details
         ]);
 

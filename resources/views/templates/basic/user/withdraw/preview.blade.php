@@ -1,14 +1,15 @@
 @extends($activeTemplate.'layouts.master')
 
 @section('content')
-    <section class="section dashboard-section">
+
+    <section class="section dashboard-section mt-5">
         <div class="container">
             <div class="row g-4">
                 <div class="col-md-6">
                     <div class="card custom--card">
                         <div class="card-header bg--base d-flex flex-wrap align-items-center justify-content-between">
                             <h6 class="text-white">@lang('Withdrawal Details')</h6>
-                            <div class="btn btn-sm btn--dark">@lang('Balance: ') {{ showAmount(auth()->user()->balance)}}  {{ __($general->cur_text) }}</div>
+                            <div class="btn btn-sm btn--dark">@lang('Balance: ') {{ showAmount($balance)}}  {{ __($withdraw->currency) }}</div>
                         </div>
                         <div class="card-body">
                             <ul class="list-group list-group-flush">
@@ -16,26 +17,26 @@
                                     <div class="ms-2 me-auto ">
                                         <b>@lang('Request Amount')</b>
                                     </div>
-                                    <span>{{showAmount($withdraw->amount)}} {{__($general->cur_text)}}</span>
+                                    <span>{{showAmount($withdraw->amount)}} {{__($withdraw->currency)}}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-start mb-2">
                                     <div class="ms-2 me-auto ">
                                         <b>@lang('Withdrawal Charge')</b>
                                     </div>
-                                    <span>{{showAmount($withdraw->charge) }} {{__($general->cur_text)}}</span>
+                                    <span>{{showAmount($withdraw->charge) }} {{__($withdraw->currency)}}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-start mb-2">
                                     <div class="ms-2 me-auto ">
                                         <b>@lang('After Charge')</b>
                                     </div>
-                                    <span>{{showAmount($withdraw->after_charge) }} {{__($general->cur_text)}}</span>
+                                    <span>{{showAmount($withdraw->after_charge) }} {{__($withdraw->currency)}}</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-start mb-2">
+                                {{-- <li class="list-group-item d-flex justify-content-between align-items-start mb-2">
                                     <div class="ms-2 me-auto ">
                                         <b>@lang('Conversion Rate')</b>
                                     </div>
-                                    <span>1 {{__($general->cur_text)}} = {{showAmount($withdraw->rate)}} {{__($withdraw->currency)}}</span>
-                                </li>
+                                    <span>1 {{__($withdraw->currency)}} = {{showAmount($withdraw->rate)}} {{__($withdraw->currency)}}</span>
+                                </li> --}}
                                 <li class="list-group-item d-flex justify-content-between align-items-start mb-2">
                                     <div class="ms-2 me-auto ">
                                         <b>@lang('You Will Get')</b>
@@ -46,7 +47,7 @@
                                     <div class="ms-2 me-auto ">
                                         <b>@lang('Balance Will be')</b>
                                     </div>
-                                    <span>{{showAmount($withdraw->user->balance - ($withdraw->amount))}} {{ __($general->cur_text) }}</span>
+                                    <span>{{showAmount($balance - ($withdraw->amount))}} {{ __($withdraw->currency) }}</span>
                                 </li>
                             </ul>
                         </div>

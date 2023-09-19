@@ -2,7 +2,7 @@
 
 @section('panel')
     <div class="row mb-none-30">
-        <div class="col-lg-12 col-md-12 mb-30">
+        {{-- <div class="col-lg-12 col-md-12 mb-30">
             <div class="card">
                 <form action="{{ route('admin.charge.global') }}" method="POST">
                     @csrf
@@ -81,7 +81,7 @@
                     </div>
                 </form>
             </div>
-        </div>
+        </div> --}}
 
         <div class="col-lg-12">
             <div class="card b-radius--10 ">

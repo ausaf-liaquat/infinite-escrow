@@ -71,6 +71,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Milestone::class);
     }
+    public function userBalance()
+    {
+        return $this->hasMany(UserBalance::class,"user_id");
+    }
     // SCOPES
 
     public function getFullnameAttribute()
