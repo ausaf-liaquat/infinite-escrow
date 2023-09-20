@@ -18,8 +18,11 @@
                     <div class="card custom--card">
                         <div class="card-header bg--base d-flex flex-wrap align-items-center justify-content-between">
                             <h6 class="text-white">@lang('Escrow Details')</h6>
+                            @if ($escrow->buyer_id != auth()->user()->id)
                             <a href="{{ route('user.escrow.milestone', encrypt($escrow->id)) }}"
                                 class="btn btn-sm btn--dark">@lang('See Milestones') <i class="las la-arrow-right"></i></a>
+                            @endif
+                            
                         </div>
                         <div class="card-body p-0">
                             <ul class="list-group list-group-flush">
@@ -35,7 +38,7 @@
                                         @if ($escrow->buyer_id == auth()->user()->id)
                                             <b>@lang('I\'m Buying from')</b>
                                         @else
-                                            <b>@lang('I\'m Selling from')</b>
+                                            <b>@lang('I\'m Selling to')</b>
                                         @endif
 
                                     </div>
@@ -206,6 +209,10 @@
                                     @if ($hasSellerAndBuyer)
                                         <button class="btn  user-action" data-value="8"
                                             data-route="{{ route('user.escrow.dispute') }}">@lang('Dispute Escrow')</button>
+                                    @endif
+                                    @if ($escrow->buyer_id == auth()->user()->id)
+                                    <a href="{{ route('user.escrow.milestone', encrypt($escrow->id)) }}"
+                                        class="btn btn-sm btn--dark">@lang('Fund Escrow') <i class="las la-arrow-right"></i></a>
                                     @endif
                                 @endif
                             </div>

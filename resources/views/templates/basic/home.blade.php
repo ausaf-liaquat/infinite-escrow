@@ -72,8 +72,8 @@
                                             Buyer
                                         </button> --}}
                                         <div class="wrapper">
-                                            <input type="radio" name="select" id="option-1" checked>
-                                            <input type="radio" name="select" id="option-2">
+                                            <input type="radio" name="type" value="1" id="option-1" checked>
+                                            <input type="radio" name="type" value="2" id="option-2">
                                             <label for="option-1" class="option option-1">
                                                 <div class="dot">
                                                     {{-- <img src="{{url('assets/images/check.png')}}" alt=""> --}}

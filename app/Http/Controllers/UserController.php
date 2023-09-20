@@ -476,12 +476,12 @@ class UserController extends Controller
       
    
         $data=[
-            'balanceAmount'               => $balanceAmount??0,
-            'depositAmount_total'         => $depositAmount_total??0,
-            'withdrawAmount_total'        => $withdrawAmount_total??0,
-            'depositAmountPending_total'  => $depositAmountPending_total??0,
-            'withdrawAmountPending_total' => $withdrawAmountPending_total??0,
-            'milestoneAmount_total'       => $milestoneAmount_total??0,
+            'balanceAmount'               => number_format($balanceAmount,2)??0,
+            'depositAmount_total'         => number_format($depositAmount_total,2)??0,
+            'withdrawAmount_total'        => number_format($withdrawAmount_total,2)??0,
+            'depositAmountPending_total'  => number_format($depositAmountPending_total,2)??0,
+            'withdrawAmountPending_total' => number_format($withdrawAmountPending_total,2)??0,
+            'milestoneAmount_total'       => number_format($milestoneAmount_total,2)??0,
             'sym'                         => $request->currency,
   
         ];

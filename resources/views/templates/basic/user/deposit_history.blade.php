@@ -10,7 +10,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <span style="font-weight: 800;">
-                                        {{ showAmount($data->amount) }} {{ __($general->cur_text) }}
+                                        {{ showAmount($data->amount) }} {{ __($data->method_currency) }}
                                     </span>
                                     <span class="float-right">
                                         {{ \Carbon\Carbon::parse($data->updated_at)->diffForHumans() }}
@@ -42,13 +42,14 @@
                                     </span>
                                     @php
                                     $details = $data->detail != null ? json_encode($data->detail) : null;
+                                    // dd($details);
                                 @endphp
                                     <span class="float-right">
                                         <a href="javascript:void(0)" class="btn btn--base btn-sm approveBtn"
                                         data-info="{{ $details }}" data-id="{{ $data->id }}"
-                                        data-amount="{{ showAmount($data->amount) }} {{ __($general->cur_text) }}"
-                                        data-charge="{{ showAmount($data->charge) }} {{ __($general->cur_text) }}"
-                                        data-after_charge="{{ showAmount($data->amount + $data->charge) }} {{ __($general->cur_text) }}"
+                                        data-amount="{{ showAmount($data->amount) }} {{ __($data->method_currency) }}"
+                                        data-charge="{{ showAmount($data->charge) }} {{ __($data->method_currency) }}"
+                                        data-after_charge="{{ showAmount($data->amount + $data->charge) }} {{ __($data->method_currency) }}"
                                         data-rate="{{ showAmount($data->rate) }} {{ __($data->method_currency) }}"
                                         data-payable="{{ showAmount($data->final_amo) }} {{ __($data->method_currency) }}">
                                         More <i class="las la-angle-right"></i>
@@ -101,7 +102,7 @@
                                     <td data-label="#@lang('Trx')">{{ $data->trx }}</td>
                                     <td data-label="@lang('Gateway')">{{ __(@$data->gateway->name) }}</td>
                                     <td data-label="@lang('Amount')">
-                                        <strong>{{ showAmount($data->amount) }} {{ __($general->cur_text) }}</strong>
+                                        <strong>{{ showAmount($data->amount) }} {{ __($data->method_currency) }}</strong>
                                     </td>
                                     <td>
                                         @if ($data->status == 1)
@@ -129,9 +130,9 @@
                                     <td data-label="@lang('Details')">
                                         <a href="javascript:void(0)" class="btn btn--base btn-sm approveBtn"
                                             data-info="{{ $details }}" data-id="{{ $data->id }}"
-                                            data-amount="{{ showAmount($data->amount) }} {{ __($general->cur_text) }}"
-                                            data-charge="{{ showAmount($data->charge) }} {{ __($general->cur_text) }}"
-                                            data-after_charge="{{ showAmount($data->amount + $data->charge) }} {{ __($general->cur_text) }}"
+                                            data-amount="{{ showAmount($data->amount) }} {{ __($data->method_currency) }}"
+                                            data-charge="{{ showAmount($data->charge) }} {{ __($data->method_currency) }}"
+                                            data-after_charge="{{ showAmount($data->amount + $data->charge) }} {{ __($data->method_currency) }}"
                                             data-rate="{{ showAmount($data->rate) }} {{ __($data->method_currency) }}"
                                             data-payable="{{ showAmount($data->final_amo) }} {{ __($data->method_currency) }}">
                                             <i class="las la-desktop"></i>
@@ -221,12 +222,14 @@
                 modal.find('.withdraw-rate').text($(this).data('rate'));
                 modal.find('.withdraw-payable').text($(this).data('payable'));
                 var list = [];
-                var details = Object.entries($(this).data('info'));
+                var details = $(this).data('info');
 
                 var ImgPath = "{{ asset(imagePath()['verify']['deposit']['path']) }}/";
                 var singleInfo = '';
+                
                 for (var i = 0; i < details.length; i++) {
-                    if (details[i][1].type == 'file') {
+                  console.log(details[i]);  
+                    if (details[i][1] == "" && details[i][1].type == 'file') {
                         singleInfo += `<li class="list-group-item">
                                             <span class="font-weight-bold "> ${details[i][0].replaceAll('_', " ")} </span> : <img src="${ImgPath}/${details[i][1].field_name}" alt="@lang('Image')" class="w-100">
                                         </li>`;

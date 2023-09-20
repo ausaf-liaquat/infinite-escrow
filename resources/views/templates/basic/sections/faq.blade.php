@@ -18,10 +18,10 @@
             <div class="col-lg-8">
                 <div class="ms-xxl-5">
 
-                    <div class="accordion custom--accordion" id="accordionExample">
+                    <div class="accordion custom--accordion" id="accordionExample"  data-aos="fade-left">
                         @foreach ($faqElements as $key => $faq)
                             <div class="accordion-item" style="box-shadow: 0 0 30px hsl(var(--dark)/0.1);"
-                                data-aos="zoom-in">
+                               >
 
                                 <h2 class="accordion-header p-3">
 

@@ -286,15 +286,15 @@ class AdminController extends Controller
         $totalWithdrawAmount_charge= Withdrawal::where('status',1)->where('currency',$request->currency)->sum('charge');
    
         $data=[
-            'data_totalEscrow'=>$data_totalEscrow??0,
-            'data_exchangeEscrow_fund'=>$data_exchangeEscrow_fund??0,
-            'data_cancelledEscrows'=>$data_cancelledEscrows??0,
-            'data_disputedEscrows'=>$data_disputedEscrows??0,
+            'data_totalEscrow'=>number_format($data_totalEscrow,2)??0,
+            'data_exchangeEscrow_fund'=>number_format($data_exchangeEscrow_fund,2)??0,
+            'data_cancelledEscrows'=>number_format($data_cancelledEscrows,2)??0,
+            'data_disputedEscrows'=>number_format($data_disputedEscrows,2)??0,
 
-            'totalDepositAmount'=>$totalDepositAmount??0,
-            'totalDepositAmount_charge'=>$totalDepositAmount_charge??0,
-            'totalWithdrawAmount'=>$totalWithdrawAmount??0,
-            'totalWithdrawAmount_charge'=>$totalWithdrawAmount_charge??0,
+            'totalDepositAmount'=>number_format($totalDepositAmount,2)??0,
+            'totalDepositAmount_charge'=>number_format($totalDepositAmount_charge,2)??0,
+            'totalWithdrawAmount'=>number_format($totalWithdrawAmount,2)??0,
+            'totalWithdrawAmount_charge'=>number_format($totalWithdrawAmount_charge,2)??0,
             'sym'=>$request->currency,
   
         ];

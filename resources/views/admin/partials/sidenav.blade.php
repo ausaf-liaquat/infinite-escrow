@@ -9,12 +9,9 @@
                 <a href="{{ route('admin.dashboard') }}" class="sidebar__logo-shape"><img
                         src="{{ getImage(imagePath()['logoIcon']['path'] . '/favicon.png') }}"
                         alt="@lang('image')"></a>
-                <button type="button" class="navbar__expand"><img
-                        style="max-width: none;    max-width: none;
-           position: absolute;
-           bottom: 4px;
-           right: 4px;"
-                        src="{{ url('assets/images/coins.png') }}" alt=""></button>
+                <button type="button" class="navbar__expand">
+                    <i class="la-dot-circle las mx-xl-n2 text--light-green"></i> 
+                </button>
             </div>
 
             <div class="sidebar__menu-wrapper" id="sidebar__menuWrapper">
@@ -604,12 +601,7 @@
                 <a href="{{ route('home') }}" class="sidebar__logo-shape"><img
                         src="{{ getImage(imagePath()['logoIcon']['path'] . '/favicon.png') }}"
                         alt="@lang('image')"></a>
-                <button type="button" class="navbar__expand"><img
-                        style="max-width: none;    max-width: none;
-                        position: absolute;
-                        bottom: 4px;
-                        right: 4px;"
-                        src="{{ url('assets/images/coins.png') }}" alt=""></button>
+                <button type="button" class="navbar__expand"><i class="la-dot-circle las mx-xl-n2 text--light-green"></i></button>
             </div>
 
             <div class="sidebar__menu-wrapper" id="sidebar__menuWrapper">

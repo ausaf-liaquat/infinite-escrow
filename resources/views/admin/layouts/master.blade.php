@@ -351,6 +351,7 @@
     </script>
     <script>
         $('.nicEdit').addClass('ck_edt').removeClass('nicEdit');
+        $('.edt').addClass('ck_edt').removeClass('nicEdit');
         ClassicEditor
             .create(document.querySelector('.ck_edt'))
             .then(editor => {
