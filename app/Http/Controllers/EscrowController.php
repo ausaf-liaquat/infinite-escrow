@@ -166,13 +166,20 @@ class EscrowController extends Controller
         }
 
         $escrow->save();
-
+        if ($escrow->buyer_id = auth()->id()) {
+            // $mailReceiver = $escrow->seller;
+            $create = 'buyer';
+        } else {
+            // $mailReceiver = $escrow->buyer;
+            $create = 'seller';
+        }
         $conversation = new Conversation();
         $conversation->escrow_id = $escrow->id;
         $conversation->buyer_id = $escrow->buyer_id;
         $conversation->seller_id = $escrow->seller_id;
         $conversation->save();
-
+        
+        
         $message = 'Escrow created successfully';
         if (!$toUser) {
             $mailReceiver = (object)[
@@ -180,14 +187,36 @@ class EscrowController extends Controller
                 'username' => $request->email,
                 'email' => $request->email
             ];
-
+            notify($mailReceiver, 'ESCROW_CREATED', [
+                'title' => $escrow->title,
+                'amount' => showAmount($escrow->amount),
+                'create' => $create,
+                'total_fund' => showAmount($escrow->paid_amount),
+                'currency' => $escrow->currency_sym,
+            ]);
             notify($mailReceiver, 'INVITATION_LINK', [
                 'link' => route('user.register'),
             ]);
 
             $message = 'Escrow created and invitation link sent successfully';
+        } else {
+            notify($toUser, 'ESCROW_CREATED', [
+                'title' => $escrow->title,
+                'amount' => showAmount($escrow->amount),
+                'create' => $create,
+                'total_fund' => showAmount($escrow->paid_amount),
+                'currency' => $escrow->currency_sym,
+            ]);
+           
         }
-
+        notify($user, 'ESCROW_CREATED', [
+            'title' => $escrow->title,
+            'amount' => showAmount($escrow->amount),
+            'create' => $create,
+            'total_fund' => showAmount($escrow->paid_amount),
+            'currency' => $escrow->currency_sym,
+        ]);
+        
         session()->forget('escrow_info');
         $notify[] = ['success', $message];
 
