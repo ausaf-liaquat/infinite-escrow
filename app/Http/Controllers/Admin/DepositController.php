@@ -197,7 +197,7 @@ class DepositController extends Controller
         $transaction = new Transaction();
         $transaction->user_id = $deposit->user_id;
         $transaction->amount = $deposit->amount;
-        $transaction->post_balance = $balance;
+        $transaction->post_balance = $userBalance->balance;
         $transaction->charge = $deposit->charge;
         $transaction->currency_sym = $deposit->method_currency;
         $transaction->trx_type = '+';

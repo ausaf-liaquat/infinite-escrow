@@ -272,10 +272,10 @@ class EscrowController extends Controller
             $query->orWhere('buyer_id', auth()->user()->id)->orWhere('seller_id', auth()->user()->id);
         })->with('conversation', 'conversation.messages', 'conversation.messages.sender', 'conversation.messages.admin')->firstOrFail();
 
-        $restAmount = ($escrow->amount + $escrow->buyer_charge) - $escrow->paid_amount;
+        $restAmount = ($escrow->amount + $escrow->charge) - $escrow->paid_amount;
         $conversation = $escrow->conversation;
         $messages = $conversation->messages;
-
+// dd($escrow,$escrow->amount , $escrow->buyer_charge);
         return view($this->activeTemplate . 'user.escrow.details', compact('pageTitle', 'escrow', 'restAmount', 'conversation', 'messages'));
     }
 
@@ -609,7 +609,7 @@ class EscrowController extends Controller
         })->firstOrFail();
 
         $milestones   = Milestone::where('escrow_id', $escrow->id)->orderBy('id', 'desc')->paginate(getPaginate());
-        $restAmount      = ($escrow->amount + $escrow->buyer_charge) - $escrow->paid_amount;
+        $restAmount      = ($escrow->amount + $escrow->charge) - $escrow->paid_amount;
         $emptyMessage = 'No milestone found';
 
         return view($this->activeTemplate . 'user.escrow.milestones', compact('pageTitle', 'emptyMessage', 'escrow', 'milestones', 'restAmount'));
@@ -624,7 +624,7 @@ class EscrowController extends Controller
         ]);
 
         $escrow     = Escrow::where('buyer_id', auth()->user()->id)->whereNotIn('status', [8, 9])->findOrFail(decrypt($request->escrow_id));
-        $restAmount    = ($escrow->amount + $escrow->buyer_charge) - $escrow->paid_amount;
+        $restAmount    = ($escrow->amount + $escrow->charge) - $escrow->paid_amount;
 
         if ($request->amount > $restAmount) {
             $notify[] = ['error', 'Your milestone couldn\'t be greater than rest amount'];
@@ -664,19 +664,23 @@ class EscrowController extends Controller
 
             return redirect()->route('user.deposit', 'checkout');
         }
-
-        if ($user->balance < $milestone->amount) {
+        $balance = $user->userBalance->where('currency_sym',$milestone->currency)->first()?->balance??0;
+        if ($balance < $milestone->amount) {
             $notify[] = ['error', 'You have no sufficient balance'];
             return back()->withNotify($notify);
         }
-
-        $user->balance -= $milestone->amount;
-        $user->save();
+        $userBalance_find = $user->userBalance->where('currency_sym',$milestone->currency)->first();
+        if ($userBalance_find) {
+            $userBalance_find->balance -= $milestone->amount;
+            $userBalance_find->save();
+        } 
+        // $user->balance -= $milestone->amount;
+        // $user->save();
 
         $transaction               = new Transaction();
         $transaction->user_id      = $user->id;
         $transaction->amount       = $milestone->amount;
-        $transaction->post_balance = $user->balance;
+        $transaction->post_balance = $user->userBalance->where('currency_sym',$milestone->currency)->first()?->balance??0;
         $transaction->charge       = 0;
         $transaction->trx_type     = '+';
         $transaction->currency_sym = $milestone->currency;

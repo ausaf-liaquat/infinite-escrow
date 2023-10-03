@@ -29,7 +29,7 @@ class EscrowController extends Controller
     {
         $pageTitle    = 'Escrow Details';
         $escrow       = Escrow::with('conversation','conversation.messages','conversation.messages.sender','conversation.messages.admin')->findOrFail($id);
-        $restAmount   = ($escrow->amount + $escrow->buyer_charge) - $escrow->paid_amount;
+        $restAmount   = ($escrow->amount + $escrow->charge) - $escrow->paid_amount;
         $conversation = $escrow->conversation;
         $messages     = $conversation->messages;
 

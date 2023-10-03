@@ -40,10 +40,16 @@
                                         @endif
                                     </td>
                                     @if ($escrow->buyer_id == auth()->user()->id && $restAmount > 0)
+                                        @php
+                                            $user = auth()->user();
+                                            $balance = $user->userBalance->where('currency_sym', $milestone->currency)->first()?->balance ?? 0;
+                                        @endphp
                                         <td data-label="@lang('Action')">
                                             <button
                                                 class="btn btn--primary btn-sm @if ($milestone->payment_status == 1) disabled @else payBtn @endif"
-                                                data-milestone_id="{{ $milestone->id }}">@lang('Pay Now')</button>
+                                                data-milestone_id="{{ $milestone->id }}"
+                                                data-balance="{{ number_format($balance, 2) }}"
+                                                data-currency_sym="{{ $milestone->currency }}">@lang('Pay Now')</button>
                                         </td>
                                     @endif
                                 </tr>
@@ -142,9 +148,9 @@
                             <label class="d-block mb-2 sm-text">@lang('Select Payment Type')</label>
                             <div class="form--select-light">
                                 <select name="pay_via" class="form-select form--select" required>
-                                    <option value="1">@lang('Wallet') - {{ showAmount(auth()->user()->balance) }}
+                                    {{-- <option value="1">@lang('Wallet') - {{ showAmount(auth()->user()->balance) }}
                                         {{ $general->cur_text }}</option>
-                                    <option value="2">@lang('Checkout')</option>
+                                    <option value="2">@lang('Checkout')</option> --}}
                                 </select>
                             </div>
                         </div>
@@ -164,9 +170,26 @@
             "use strict"
 
             $('.payBtn').on('click', function() {
-                console.log('abc');
                 var modal = $('#payModal');
+                var options = [{
+                        value: '1',
+                        text: `Wallet - ${$(this).data('balance')} ${$(this).data('currency_sym')}`
+                    },
+                    {
+                        value: '2',
+                        text: 'Checkout'
+                    },
+                ];
+                options.forEach(function(option) {
+                    modal.find('[name=pay_via]').append($('<option>', {
+                        value: option.value,
+                        text: option.text
+                    }));
+                });
+                console.log('abc');
+                
                 modal.find('[name=milestone_id]').val($(this).data('milestone_id'));
+                // modal.find('[name=pay_via]').val($(this).data('milestone_id'))
                 modal.modal('show');
             })
         })(jQuery);

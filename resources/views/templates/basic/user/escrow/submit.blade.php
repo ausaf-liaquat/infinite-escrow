@@ -26,7 +26,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-12 mt-4">
-                                        <label class="d-block mb-2 sm-text">@lang('Charge will Pay')</label>
+                                        <label class="d-block mb-2 sm-text">@lang('Charge will be paid by')</label>
                                         <div class="form--select-light">
                                             <select name="charge_payer" class="form-select form--select" required>
                                                 <option value="1">@lang('Seller')</option>
