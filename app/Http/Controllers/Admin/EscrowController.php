@@ -29,7 +29,26 @@ class EscrowController extends Controller
     {
         $pageTitle    = 'Escrow Details';
         $escrow       = Escrow::with('conversation','conversation.messages','conversation.messages.sender','conversation.messages.admin')->findOrFail($id);
-        $restAmount   = ($escrow->amount + $escrow->charge) - $escrow->paid_amount;
+
+        $chargeAmount=0;
+        if ($escrow->charge_payer == 1) {
+            if ($escrow->seller_id == auth()->user()->id) {
+                 $chargeAmount = $escrow->seller_charge;
+            }
+           
+           
+        } elseif ($escrow->charge_payer == 2) {
+            if ($escrow->buyer_id == auth()->user()->id) {
+                $chargeAmount = $escrow->buyer_charge;
+           }
+            // Buyer pays the charges
+           
+        } elseif ($escrow->charge_payer == 3) {
+            // Split charges 50-50
+            $chargeAmount = ($escrow->seller_charge + $escrow->buyer_charge) / 2;
+        }
+
+        $restAmount   = ($escrow->amount + $chargeAmount) - $escrow->paid_amount;
         $conversation = $escrow->conversation;
         $messages     = $conversation->messages;
 

@@ -200,7 +200,24 @@ class MobileEscrowController  extends Controller
         $escrow = Escrow::where('id', $id)->where(function ($query) {
             $query->orWhere('buyer_id', auth()->user()->id)->orWhere('seller_id', auth()->user()->id);
         })->with( 'seller','buyer' , 'disputer', 'conversation', 'conversation.messages', 'conversation.messages.sender', 'conversation.messages.admin')->firstOrFail();
-        $restAmount = ($escrow->amount + $escrow->buyer_charge) - $escrow->paid_amount;
+        $chargeAmount=0;
+        if ($escrow->charge_payer == 1) {
+            if ($escrow->seller_id == auth()->user()->id) {
+                 $chargeAmount = $escrow->seller_charge;
+            }
+           
+           
+        } elseif ($escrow->charge_payer == 2) {
+            if ($escrow->buyer_id == auth()->user()->id) {
+                $chargeAmount = $escrow->buyer_charge;
+           }
+            // Buyer pays the charges
+           
+        } elseif ($escrow->charge_payer == 3) {
+            // Split charges 50-50
+            $chargeAmount = ($escrow->seller_charge + $escrow->buyer_charge) / 2;
+        }
+        $restAmount = ($escrow->amount + $chargeAmount) - $escrow->paid_amount;
         $milestoneFunded = $escrow->milestones->where('payment_status', 1)->sum('amount');
         $milestoneUnfunded = $escrow->milestones->where('payment_status', 0)->sum('amount');
         return response()->json([
@@ -978,7 +995,24 @@ class MobileEscrowController  extends Controller
         }
 
         $escrow = Escrow::where('buyer_id', auth()->user()->id)->whereNotIn('status', [8, 9])->findOrFail($request->escrow_id);
-        $restAmount    = ($escrow->amount + $escrow->buyer_charge) - $escrow->paid_amount;
+        $chargeAmount=0;
+        if ($escrow->charge_payer == 1) {
+            if ($escrow->seller_id == auth()->user()->id) {
+                 $chargeAmount = $escrow->seller_charge;
+            }
+           
+           
+        } elseif ($escrow->charge_payer == 2) {
+            if ($escrow->buyer_id == auth()->user()->id) {
+                $chargeAmount = $escrow->buyer_charge;
+           }
+            // Buyer pays the charges
+           
+        } elseif ($escrow->charge_payer == 3) {
+            // Split charges 50-50
+            $chargeAmount = ($escrow->seller_charge + $escrow->buyer_charge) / 2;
+        }
+        $restAmount    = ($escrow->amount + $chargeAmount) - $escrow->paid_amount;
 
         if ($request->amount > $restAmount) {
             $notify = ['Your milestone couldn\'t be greater than rest amount'];

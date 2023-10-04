@@ -627,7 +627,26 @@ class EscrowController extends Controller
         })->firstOrFail();
 
         $milestones   = Milestone::where('escrow_id', $escrow->id)->orderBy('id', 'desc')->paginate(getPaginate());
-        $restAmount      = ($escrow->amount + $escrow->charge) - $escrow->paid_amount;
+
+        $chargeAmount=0;
+        if ($escrow->charge_payer == 1) {
+            if ($escrow->seller_id == auth()->user()->id) {
+                 $chargeAmount = $escrow->seller_charge;
+            }
+           
+           
+        } elseif ($escrow->charge_payer == 2) {
+            if ($escrow->buyer_id == auth()->user()->id) {
+                $chargeAmount = $escrow->buyer_charge;
+           }
+            // Buyer pays the charges
+           
+        } elseif ($escrow->charge_payer == 3) {
+            // Split charges 50-50
+            $chargeAmount = ($escrow->seller_charge + $escrow->buyer_charge) / 2;
+        }
+
+        $restAmount      = ($escrow->amount + $chargeAmount) - $escrow->paid_amount;
         $emptyMessage = 'No milestone found';
 
         return view($this->activeTemplate . 'user.escrow.milestones', compact('pageTitle', 'emptyMessage', 'escrow', 'milestones', 'restAmount'));
@@ -642,7 +661,27 @@ class EscrowController extends Controller
         ]);
 
         $escrow     = Escrow::where('buyer_id', auth()->user()->id)->whereNotIn('status', [8, 9])->findOrFail(decrypt($request->escrow_id));
-        $restAmount    = ($escrow->amount + $escrow->charge) - $escrow->paid_amount;
+        
+        $chargeAmount=0;
+        if ($escrow->charge_payer == 1) {
+            if ($escrow->seller_id == auth()->user()->id) {
+                 $chargeAmount = $escrow->seller_charge;
+            }
+           
+           
+        } elseif ($escrow->charge_payer == 2) {
+            if ($escrow->buyer_id == auth()->user()->id) {
+                $chargeAmount = $escrow->buyer_charge;
+           }
+            // Buyer pays the charges
+           
+        } elseif ($escrow->charge_payer == 3) {
+            // Split charges 50-50
+            $chargeAmount = ($escrow->seller_charge + $escrow->buyer_charge) / 2;
+        }
+
+
+        $restAmount    = ($escrow->amount + $chargeAmount) - $escrow->paid_amount;
 
         if ($request->amount > $restAmount) {
             $notify[] = ['error', 'Your milestone couldn\'t be greater than rest amount'];
