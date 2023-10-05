@@ -660,6 +660,48 @@
     <link rel="stylesheet" href="{{ url('') }}/assets/dd.css">
     @stack('style-lib')
     @stack('style')
+    <style>
+        .fixed-header .header-fixed {
+            position: fixed;
+            top: inherit !important;
+            left: 0;
+            box-shadow: 0 15px 30px hsl(var(--black)/0.1);
+        }
+
+
+        .goog-te-gadget-icon {
+            display: none;
+        }
+
+        .form--select-dark .form--select-sm {
+            color: hsl(var(--accent)) !important;
+            background: transparent !important;
+        }
+
+        .form--select-dark {
+            position: relative;
+            isolation: isolate;
+            border-radius: 3px;
+            border: none !important;
+            background: transparent !important;
+        }
+
+        .goog-te-gadget-simple {
+            background-color: #ecebf0 !important;
+            border: 0 !important;
+            font-size: 10pt;
+            font-weight: 800;
+            display: inline-block;
+            padding: 10px 10px !important;
+            cursor: pointer;
+            zoom: 1;
+        }
+
+        .goog-te-gadget-simple span {
+            color: #3e3065 !important;
+
+        }
+    </style>
 </head>
 
 <body>
@@ -805,6 +847,38 @@
 
     <script src="{{ url('') }}/assets/dd.min.js"></script>
     <script></script>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en'
+            }, 'google_translate_element');
+        }
+    </script>
+
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+    </script>
+    <script>
+        $(document).ready(function() {
+            setInterval(() => {
+                $('#google_translate_element').find(".goog-te-combo").addClass(
+                    "form-select form--select-sm langSel");
+
+                $(".skiptranslate").removeData("data")
+                $(".skiptranslate").contents().filter(function() {
+                    return this.nodeType === 3; // Select text nodes (nodeType 3)
+                }).remove();
+                $(".skiptranslate").contents().filter(function() {
+                    return this.nodeType === 3; // Select text nodes (nodeType 3)
+                }).remove();
+                $(".skiptranslate").find('span').remove();
+            }, 100);
+
+            // 
+        });
+
+        console.log('dddwedwed');
+    </script>
+
 </body>
 
 </html>

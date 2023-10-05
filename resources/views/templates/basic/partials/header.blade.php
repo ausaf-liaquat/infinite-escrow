@@ -39,11 +39,12 @@
                 <ul class="list primary-menu primary-menu--alt">
                   <li class="primary-menu__list text-center">
                     <div class="form--select-dark d-flex align-items-center">
-                      <select class="form-select form--select-sm langSel">
+                      <div id="google_translate_element"></div>
+                      {{-- <select class="form-select form--select-sm langSel">
                             @foreach($language as $lang)
                                 <option value="{{$lang->code}}" @if(session('lang') == $lang->code) selected  @endif>{{ __($lang->name) }}</option>
                             @endforeach
-                      </select>
+                      </select> --}}
                     </div>
                   </li>
 
