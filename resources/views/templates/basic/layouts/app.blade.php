@@ -542,18 +542,26 @@
 
         .imgRes {
             z-index: 1;
-            position: absolute;
+            position: relative;
             top: -236px;
             height: 558px;
             left: 54px;
         }
 
-        .iframCustom {
+        /* .iframCustom {
             z-index: -1;
             width: 240px;
             left: 88px;
             height: 506px;
             top: -216px;
+            position: absolute;
+        } */
+        .iframCustom {
+            z-index: -1;
+            width: 248px;
+            left: 95px;
+            height: 506px;
+            top: -191px;
             position: absolute;
         }
 
@@ -566,10 +574,16 @@
             }
 
             .iframCustom {
-                z-index: -1 !important;
+                /* z-index: -1 !important;
                 width: 227px !important;
                 left: 76px !important;
                 height: 480px !important;
+                top: -146px !important;
+                position: relative !important; */
+                z-index: -1 !important;
+                width: 236px !important;
+                left: 81px !important;
+                height: 503px !important;
                 top: -146px !important;
                 position: relative !important;
             }
@@ -580,8 +594,11 @@
         @media (max-width: 768px) {
             .imgRes {
                 /* z-index: 1; */
-                position: absolute;
+                /* position: relative;
                 top: -223px;
+                height: 90%; */
+                position: relative;
+                top: -236px;
                 height: 90%;
             }
 
@@ -596,25 +613,41 @@
         }
 
         @media (max-width: 800px) {
-            .imgRes {
+            /* .imgRes {
 
                 position: absolute;
                 top: -223px;
                 height: 107%;
+            } */
+
+            .imgRes {
+                /* position: relative;
+                top: -223px;
+                height: 115%; */
+                width: 308px;
             }
 
-            .iframCustom {
-                /* z-index: -1;
+            /* .iframCustom { */
+            /* z-index: -1;
                 width: 125px;
                 left: 73px;
                 height: 506px;
                 top: -332px;
                 position: absolute; */
-                z-index: -1;
+            /* z-index: -1;
                 width: 172px;
                 left: 79px;
                 height: 506px;
                 top: -277px;
+                position: absolute; */
+            /* } */
+
+            .iframCustom {
+                z-index: -1;
+                width: 288px;
+                left: 79px;
+                height: 507px;
+                top: -192px;
                 position: absolute;
             }
 
@@ -643,16 +676,22 @@
                 /* z-index: 1; */
                 position: absolute !important;
                 top: -143px !important;
-                height: 52% !important;
+                height: 54% !important;
                 left: 17px;
             }
 
             .iframCustom {
-                z-index: -1 !important;
+                /* z-index: -1 !important;
                 width: 227px !important;
                 left: 33px !important;
                 height: 454px !important;
                 top: -147px !important;
+                position: relative !important; */
+                z-index: -1 !important;
+                width: 238px !important;
+                left: 42px !important;
+                height: 494px !important;
+                top: -146px !important;
                 position: relative !important;
             }
         }
@@ -700,6 +739,15 @@
         .goog-te-gadget-simple span {
             color: #3e3065 !important;
 
+        }
+
+        @media (min-width: 700px) .topDiv {
+            z-index: -1;
+            width: 172px;
+            left: 79px;
+            height: 506px;
+            top: -277px;
+            position: absolute;
         }
     </style>
 </head>

@@ -264,7 +264,7 @@
             margin-left: 50px;
         }
 
-        @media only screen and (max-width: 480px) {
+        @media only screen and (max-width: 770px) {
             .wrapper .option {
 
                 padding: 0 13px !important;
